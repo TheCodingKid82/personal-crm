@@ -1,19 +1,46 @@
 {
-  "lastUpdated": "2025-01-25T05:20:00Z",
+  "lastUpdated": "2025-01-25T05:45:00Z",
   "updatedBy": "Claude",
   
   "briefing": {
     "greeting": "Good morning, Andrew! ☀️",
-    "summary": "Big progress on Booked.Travel finance dashboard yesterday. All payment forecasts now pull directly from Whop API - no more fake estimates.",
+    "summary": "Big progress on Booked.Travel yesterday - finance dashboard now pulls real data from Whop API. While you were sleeping, I built this Command Center dashboard and thought about some ideas for Spark Studio.",
     "highlights": [
       "✅ Finance dashboard rewritten with pure Whop data",
       "📊 Forecast shows $26k in next 30 days, $52k in 60 days",
-      "🔧 Fixed: Array param encoding for Whop API (statuses[])"
+      "🔧 Fixed: Array param encoding for Whop API (statuses[])",
+      "🆕 Built this Command Center dashboard for daily use"
     ],
     "priorities": [
       "Review the new finance dashboard at admin.booked.travel/finance",
       "Check if any Insider Expeditions requests came in via Slack",
-      "Announcements App CVR optimization"
+      "Try this Command Center - run start.bat in spark-command-center folder"
+    ]
+  },
+  
+  "overnightReport": {
+    "title": "💡 Ideas While You Slept",
+    "thoughts": [
+      {
+        "category": "Announcements App",
+        "idea": "A/B testing framework for checkout pages",
+        "details": "Could automatically test different copy, pricing displays, or CTA buttons and track conversion. Run tests, measure, iterate."
+      },
+      {
+        "category": "Booked.Travel",
+        "idea": "Automated payment reminders via Whop webhooks",
+        "details": "When Whop fires 'payment.failed', send a friendly reminder email. Could reduce churn on failed payments."
+      },
+      {
+        "category": "This Dashboard",
+        "idea": "Make it live-updating via websocket",
+        "details": "I could push updates in real-time during our sessions so you see progress as it happens."
+      },
+      {
+        "category": "Spark Studio",
+        "idea": "Weekly digest email",
+        "details": "Automated summary of all projects' progress, MRR changes, tasks completed. Sent every Monday morning."
+      }
     ]
   },
   
