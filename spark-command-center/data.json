@@ -1,0 +1,132 @@
+{
+  "lastUpdated": "2025-01-25T05:20:00Z",
+  "updatedBy": "Claude",
+  
+  "briefing": {
+    "greeting": "Good morning, Andrew! ☀️",
+    "summary": "Big progress on Booked.Travel finance dashboard yesterday. All payment forecasts now pull directly from Whop API - no more fake estimates.",
+    "highlights": [
+      "✅ Finance dashboard rewritten with pure Whop data",
+      "📊 Forecast shows $26k in next 30 days, $52k in 60 days",
+      "🔧 Fixed: Array param encoding for Whop API (statuses[])"
+    ],
+    "priorities": [
+      "Review the new finance dashboard at admin.booked.travel/finance",
+      "Check if any Insider Expeditions requests came in via Slack",
+      "Announcements App CVR optimization"
+    ]
+  },
+  
+  "projects": [
+    {
+      "id": "announcements",
+      "name": "Announcements App",
+      "status": "active",
+      "priority": "high",
+      "description": "#1 third-party app on Whop",
+      "mrr": "$7,000",
+      "goal": "Maximize MRR through CVR optimization",
+      "lastActivity": "AI agent strategy for CVR testing",
+      "color": "#10b981"
+    },
+    {
+      "id": "booked-travel",
+      "name": "Booked.Travel",
+      "status": "active",
+      "priority": "high",
+      "description": "Travel agency management platform",
+      "client": "Insider Expeditions (paid $8k)",
+      "lastActivity": "Finance dashboard - Whop integration complete",
+      "nextSteps": "Review with Matt, plan release to other agencies",
+      "color": "#3b82f6"
+    },
+    {
+      "id": "funnels",
+      "name": "Funnels App",
+      "status": "in-progress",
+      "priority": "medium",
+      "description": "AI-powered funnel builder",
+      "lead": "Cale",
+      "lastActivity": "Development in progress",
+      "color": "#8b5cf6"
+    }
+  ],
+  
+  "tasks": [
+    {
+      "id": "t1",
+      "title": "Review finance dashboard accuracy",
+      "project": "booked-travel",
+      "priority": "high",
+      "status": "pending",
+      "dueDate": "2025-01-26",
+      "notes": "Check if Whop data matches expectations"
+    },
+    {
+      "id": "t2",
+      "title": "Monitor Insider Expeditions Slack",
+      "project": "booked-travel",
+      "priority": "medium",
+      "status": "ongoing",
+      "notes": "Handle any requests from Matt"
+    },
+    {
+      "id": "t3",
+      "title": "CVR optimization strategy",
+      "project": "announcements",
+      "priority": "high",
+      "status": "planning",
+      "notes": "AI agent: test → feedback → improve code → repeat"
+    }
+  ],
+  
+  "recentActivity": [
+    {
+      "timestamp": "2025-01-25T05:15:00Z",
+      "type": "deploy",
+      "description": "Finance dashboard deployed with Whop-only data",
+      "project": "booked-travel"
+    },
+    {
+      "timestamp": "2025-01-25T04:00:00Z",
+      "type": "fix",
+      "description": "Fixed Whop API array parameter encoding",
+      "project": "booked-travel"
+    },
+    {
+      "timestamp": "2025-01-25T03:00:00Z",
+      "type": "research",
+      "description": "Discovered split_pay_required_payments field for installments",
+      "project": "booked-travel"
+    }
+  ],
+  
+  "quickLinks": [
+    { "name": "Booked.Travel Admin", "url": "https://admin.booked.travel", "icon": "🌴" },
+    { "name": "Whop Dashboard", "url": "https://whop.com/dashboard", "icon": "💰" },
+    { "name": "GitHub", "url": "https://github.com/Osis-AI-LLC", "icon": "🐙" },
+    { "name": "Slack (Insider)", "url": "https://slack.com", "icon": "💬" }
+  ],
+  
+  "notes": [
+    {
+      "id": "n1",
+      "title": "Whop API Tips",
+      "content": "Array params need URL encoding: statuses%5B%5D=active. Always include company_id. split_pay_required_payments = total installments.",
+      "category": "technical"
+    },
+    {
+      "id": "n2", 
+      "title": "Insider Expeditions Contacts",
+      "content": "Matt is the main contact. Slack channel for communications. They paid $8k for Booked.Travel setup.",
+      "category": "business"
+    }
+  ],
+  
+  "stats": {
+    "projectsActive": 3,
+    "tasksOpen": 3,
+    "deploysToday": 4,
+    "lastSync": "2025-01-25T05:20:00Z"
+  }
+}
