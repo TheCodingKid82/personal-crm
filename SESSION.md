@@ -3,12 +3,19 @@
 > **READ THIS FIRST EVERY SESSION.** This is your handoff from past-you to current-you.
 
 ## Last Updated
-2026-01-26 10:03 PM EST
+2026-01-26 10:30 PM EST
 
 ## What Was I Just Doing?
-- Helping Andrew send a refund email to Duet (screen sharing software)
-- Browser is OPEN at Outlook login (andreweir@weirtech.net) waiting for Andrew's password
-- Found Duet support email: legal@duetdisplay.com
+- Trying to index memory for semantic search - OpenAI batch API keeps timing out
+- Built new memory system (SESSION.md, project files)
+- Browser still OPEN at Outlook login (andreweir@weirtech.net) - Duet refund email pending
+- Duet support email: legal@duetdisplay.com
+
+## Memory Search Status
+- OpenAI API key configured ✅
+- memory_search connects to OpenAI ✅
+- Indexing fails (batch API slow) - use grep as fallback
+- Command: `Select-String -Path "C:\Users\theul\clawd\memory\*.md" -Pattern "search term"`
 
 ## Active Projects
 
@@ -45,6 +52,7 @@
 ## Pending/Waiting On
 - [ ] Andrew's password for Outlook login (Duet refund email)
 - [ ] Matt's next requests (Slack)
+- [ ] Memory indexing - OpenAI batch API keeps timing out (use grep for now)
 
 ## Today's Completed Work
 - [x] Private room per-participant feature
@@ -53,6 +61,9 @@
 - [x] Fixed build errors (packagePricePerParticipant → basePackagePrice)
 - [x] Updated Clawdbot (npm) to v2026.1.24-3
 - [x] Created 8 AM daily auto-update cron job
+- [x] Built new memory system (SESSION.md + project files)
+- [x] Added OpenAI API key to Clawdbot for memory_search
+- [x] Found Duet support email, opened Outlook for refund request
 
 ## Cron Jobs Active
 | Name | Schedule | Purpose |
