@@ -1,35 +1,46 @@
 # TOOLS.md - Local Notes
 
-Skills define *how* tools work. This file is for *your* specifics — the stuff that's unique to your setup.
+## Spark Studio Resources
 
-## What Goes Here
+### Codebases
+- **Announcements App:** `C:\Users\theul\Desktop\Osis\announcements-whop-app`
+  - Next.js app with app router
+  - Key files: `app/`, `components/`, `lib/`, `utils/`
+  - Strategy docs: `CONVERSION_OPTIMIZATION_PLAN_V2.md`, `HARD_PAYWALL_PLAN.md`
+  - AI knowledge base: `AI_SUPPORT_AGENT_KNOWLEDGE_BASE.md`
+  
+- **Insider Expeditions:** `C:\Users\theul\clawd\temp-booked` (Booked.Travel)
 
-Things like:
-- Camera names and locations
-- SSH hosts and aliases  
-- Preferred voices for TTS
-- Speaker/room names
-- Device nicknames
-- Anything environment-specific
+### Whop Dashboard
+- **URL:** https://whop.com/dashboard/biz_7MiHfVRaR8S1LN/
+- **Business ID:** biz_7MiHfVRaR8S1LN
+- **Cancellation Reasons:** /cancelation-reasons/
+- **Payments:** /payments/
+- **Resolution Cases:** /payments/?actionRequired=true
 
-## Examples
+### Deployment
+- **Railway:** Access via browser
+- **GitHub:** Access via browser (repos in Osis directory locally)
 
-```markdown
-### Cameras
-- living-room → Main area, 180° wide angle
-- front-door → Entrance, motion-triggered
+### Communication
+- **Slack:** Access via browser for Insider Expeditions / Matt requests
+- **Telegram:** Andrew (@thecodingkid)
 
-### SSH
-- home-server → 192.168.1.100, user: admin
+---
 
-### TTS
-- Preferred voice: "Nova" (warm, slightly British)
-- Default speaker: Kitchen HomePod
-```
+## Conversion Optimization Notes
 
-## Why Separate?
+### Current Bottlenecks (from CONVERSION_OPTIMIZATION_PLAN_V2.md):
+1. Modal appears at 2 seconds with no value demo - 95% drop
+2. Generic feature copy instead of outcomes - 90% drop  
+3. External checkout flow - 40% drop
+4. Multiple upsell offers cause decision fatigue - 70% drop
 
-Skills are shared. Your setup is yours. Keeping them apart means you can update skills without losing your notes, and share skills without leaking your infrastructure.
+### Key Files to Edit:
+- `daily-hub-promo-modal.tsx` - Main paywall modal
+- `feature-hub-paywall.tsx` - Feature paywall
+- `lib/config/modal-copy.ts` - Copy/messaging
+- `post-purchase-upsell-modal.tsx` - Upsells
 
 ---
 

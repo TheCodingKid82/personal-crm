@@ -1,0 +1,12 @@
+{
+  "lastChecks": {
+    "whopDashboard": null,
+    "cancellationReasons": null,
+    "resolutionCases": null,
+    "slack": null,
+    "email": null,
+    "calendar": null
+  },
+  "lastHeartbeat": "2026-01-26T19:30:00-05:00",
+  "notes": "Browser unavailable - couldn't check dashboard/Slack"
+}

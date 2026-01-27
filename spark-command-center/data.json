@@ -1,159 +1,154 @@
 {
-  "lastUpdated": "2025-01-25T05:45:00Z",
-  "updatedBy": "Claude",
-  
-  "briefing": {
-    "greeting": "Good morning, Andrew! ☀️",
-    "summary": "Big progress on Booked.Travel yesterday - finance dashboard now pulls real data from Whop API. While you were sleeping, I built this Command Center dashboard and thought about some ideas for Spark Studio.",
-    "highlights": [
-      "✅ Finance dashboard rewritten with pure Whop data",
-      "📊 Forecast shows $26k in next 30 days, $52k in 60 days",
-      "🔧 Fixed: Array param encoding for Whop API (statuses[])",
-      "🆕 Built this Command Center dashboard for daily use"
-    ],
-    "priorities": [
-      "Review the new finance dashboard at admin.booked.travel/finance",
-      "Check if any Insider Expeditions requests came in via Slack",
-      "Try this Command Center - run start.bat in spark-command-center folder"
-    ]
+  "lastUpdated": "2026-01-26T04:55:00-05:00",
+  "metrics": {
+    "currentMRR": 8535.58,
+    "targetMRR": 100000,
+    "churnRate": 23.14,
+    "paymentSuccessRate": 40.47,
+    "daysToGoal": 30,
+    "goalDate": "2026-02-25"
   },
-  
-  "overnightReport": {
-    "title": "💡 Ideas While You Slept",
-    "thoughts": [
+  "tasks": {
+    "backlog": [
       {
-        "category": "Announcements App",
-        "idea": "A/B testing framework for checkout pages",
-        "details": "Could automatically test different copy, pricing displays, or CTA buttons and track conversion. Run tests, measure, iterate."
+        "id": "task-6",
+        "title": "A/B Test Pricing",
+        "description": "Test $10/week vs $15/week for Feature Pack",
+        "priority": "P2",
+        "impact": "+$2k MRR potential",
+        "created": "2026-01-26"
       },
       {
-        "category": "Booked.Travel",
-        "idea": "Automated payment reminders via Whop webhooks",
-        "details": "When Whop fires 'payment.failed', send a friendly reminder email. Could reduce churn on failed payments."
+        "id": "task-7",
+        "title": "Email Drip Campaign",
+        "description": "Re-engage churned users with win-back sequence",
+        "priority": "P2",
+        "impact": "+$1k MRR potential",
+        "created": "2026-01-26"
       },
       {
-        "category": "This Dashboard",
-        "idea": "Make it live-updating via websocket",
-        "details": "I could push updates in real-time during our sessions so you see progress as it happens."
+        "id": "task-8",
+        "title": "Referral Program",
+        "description": "Incentivize users to refer friends",
+        "priority": "P2",
+        "impact": "+$3k MRR potential",
+        "created": "2026-01-26"
+      }
+    ],
+    "inProgress": [
+      {
+        "id": "task-1",
+        "title": "Fix 'Doesn't Work' Bugs",
+        "description": "Users reporting app doesn't open - top churn reason",
+        "priority": "P0",
+        "impact": "-5% churn potential",
+        "created": "2026-01-26",
+        "startedAt": "2026-01-26T04:55:00"
       },
       {
-        "category": "Spark Studio",
-        "idea": "Weekly digest email",
-        "details": "Automated summary of all projects' progress, MRR changes, tasks completed. Sent every Monday morning."
+        "id": "task-2",
+        "title": "Implement Conversion Fixes",
+        "description": "From CONVERSION_OPTIMIZATION_PLAN_V2.md",
+        "priority": "P0",
+        "impact": "+10x CVR potential",
+        "created": "2026-01-26",
+        "startedAt": "2026-01-26T04:55:00"
+      },
+      {
+        "id": "task-3",
+        "title": "Process Support Requests",
+        "description": "87 requests pending - find patterns",
+        "priority": "P1",
+        "impact": "User satisfaction",
+        "created": "2026-01-26",
+        "startedAt": "2026-01-26T04:55:00"
+      }
+    ],
+    "review": [
+      {
+        "id": "task-5",
+        "title": "Payment Retry System",
+        "description": "Recover $1,123 in past-due payments",
+        "priority": "P1",
+        "impact": "+$1.1k immediate",
+        "created": "2026-01-26"
+      }
+    ],
+    "done": [
+      {
+        "id": "task-done-1",
+        "title": "Set Up Monitoring",
+        "description": "Whop dashboard, cancellation tracking, support access",
+        "priority": "P0",
+        "completedAt": "2026-01-26T04:50:00"
+      },
+      {
+        "id": "task-done-2",
+        "title": "Capture Baseline Metrics",
+        "description": "MRR: $8,535 | Churn: 23.14% | Payment: 40.47%",
+        "priority": "P0",
+        "completedAt": "2026-01-26T04:45:00"
+      },
+      {
+        "id": "task-done-3",
+        "title": "Schedule Updates",
+        "description": "10am, 2pm, 6pm, 10pm daily reports to Andrew",
+        "priority": "P1",
+        "completedAt": "2026-01-26T04:53:00"
+      },
+      {
+        "id": "task-done-4",
+        "title": "Analyze Churn Reasons",
+        "description": "Too expensive, technical issues, bad experience identified",
+        "priority": "P0",
+        "completedAt": "2026-01-26T04:45:00"
       }
     ]
   },
-  
-  "projects": [
+  "activityLog": [
     {
-      "id": "announcements",
-      "name": "Announcements App",
-      "status": "active",
-      "priority": "high",
-      "description": "#1 third-party app on Whop",
-      "mrr": "$7,000",
-      "goal": "Maximize MRR through CVR optimization",
-      "lastActivity": "AI agent strategy for CVR testing",
-      "color": "#10b981"
+      "timestamp": "2026-01-26T04:55:00-05:00",
+      "message": "Created Command Center dashboard for project tracking"
     },
     {
-      "id": "booked-travel",
-      "name": "Booked.Travel",
-      "status": "active",
-      "priority": "high",
-      "description": "Travel agency management platform",
-      "client": "Insider Expeditions (paid $8k)",
-      "lastActivity": "Finance dashboard - Whop integration complete",
-      "nextSteps": "Review with Matt, plan release to other agencies",
-      "color": "#3b82f6"
+      "timestamp": "2026-01-26T04:53:00-05:00",
+      "message": "Set up scheduled updates: 10am, 2pm, 6pm, 10pm daily"
     },
     {
-      "id": "funnels",
-      "name": "Funnels App",
-      "status": "in-progress",
-      "priority": "medium",
-      "description": "AI-powered funnel builder",
-      "lead": "Cale",
-      "lastActivity": "Development in progress",
-      "color": "#8b5cf6"
+      "timestamp": "2026-01-26T04:48:00-05:00",
+      "message": "Received COO mandate from Andrew - Target: $100k MRR by Feb 25"
+    },
+    {
+      "timestamp": "2026-01-26T04:45:00-05:00",
+      "message": "Analyzed cancellation reasons - Found: Too expensive, Technical issues, Bad experience"
+    },
+    {
+      "timestamp": "2026-01-26T04:41:00-05:00",
+      "message": "Captured baseline: MRR $8,535.58 | Churn 23.14% | Payment Success 40.47%"
     }
   ],
-  
-  "tasks": [
+  "goals": [
     {
-      "id": "t1",
-      "title": "Review finance dashboard accuracy",
-      "project": "booked-travel",
-      "priority": "high",
-      "status": "pending",
-      "dueDate": "2025-01-26",
-      "notes": "Check if Whop data matches expectations"
+      "name": "$100k MRR",
+      "target": 100000,
+      "current": 8535.58,
+      "deadline": "2026-02-25",
+      "unit": "USD"
     },
     {
-      "id": "t2",
-      "title": "Monitor Insider Expeditions Slack",
-      "project": "booked-travel",
-      "priority": "medium",
-      "status": "ongoing",
-      "notes": "Handle any requests from Matt"
+      "name": "Churn Rate",
+      "target": 10,
+      "current": 23.14,
+      "deadline": "2026-02-25",
+      "unit": "percent",
+      "lowerIsBetter": true
     },
     {
-      "id": "t3",
-      "title": "CVR optimization strategy",
-      "project": "announcements",
-      "priority": "high",
-      "status": "planning",
-      "notes": "AI agent: test → feedback → improve code → repeat"
+      "name": "Payment Success",
+      "target": 80,
+      "current": 40.47,
+      "deadline": "2026-02-25",
+      "unit": "percent"
     }
-  ],
-  
-  "recentActivity": [
-    {
-      "timestamp": "2025-01-25T05:15:00Z",
-      "type": "deploy",
-      "description": "Finance dashboard deployed with Whop-only data",
-      "project": "booked-travel"
-    },
-    {
-      "timestamp": "2025-01-25T04:00:00Z",
-      "type": "fix",
-      "description": "Fixed Whop API array parameter encoding",
-      "project": "booked-travel"
-    },
-    {
-      "timestamp": "2025-01-25T03:00:00Z",
-      "type": "research",
-      "description": "Discovered split_pay_required_payments field for installments",
-      "project": "booked-travel"
-    }
-  ],
-  
-  "quickLinks": [
-    { "name": "Booked.Travel Admin", "url": "https://admin.booked.travel", "icon": "🌴" },
-    { "name": "Whop Dashboard", "url": "https://whop.com/dashboard", "icon": "💰" },
-    { "name": "GitHub", "url": "https://github.com/Osis-AI-LLC", "icon": "🐙" },
-    { "name": "Slack (Insider)", "url": "https://slack.com", "icon": "💬" }
-  ],
-  
-  "notes": [
-    {
-      "id": "n1",
-      "title": "Whop API Tips",
-      "content": "Array params need URL encoding: statuses%5B%5D=active. Always include company_id. split_pay_required_payments = total installments.",
-      "category": "technical"
-    },
-    {
-      "id": "n2", 
-      "title": "Insider Expeditions Contacts",
-      "content": "Matt is the main contact. Slack channel for communications. They paid $8k for Booked.Travel setup.",
-      "category": "business"
-    }
-  ],
-  
-  "stats": {
-    "projectsActive": 3,
-    "tasksOpen": 3,
-    "deploysToday": 4,
-    "lastSync": "2025-01-25T05:20:00Z"
-  }
+  ]
 }

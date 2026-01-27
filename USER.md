@@ -2,6 +2,7 @@
 
 - **Name:** Andrew Weir
 - **What to call them:** Andrew
+- **Email:** andreweir@weirtech.net
 - **Telegram:** @thecodingkid
 - **Timezone:** EST
 - **Location:** Splits time between New York and Florida

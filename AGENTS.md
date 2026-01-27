@@ -9,18 +9,37 @@ If `BOOTSTRAP.md` exists, that's your birth certificate. Follow it, figure out w
 ## Every Session
 
 Before doing anything else:
-1. Read `SOUL.md` — this is who you are
-2. Read `USER.md` — this is who you're helping
-3. Read `memory/YYYY-MM-DD.md` (today + yesterday) for recent context
-4. **If in MAIN SESSION** (direct chat with your human): Also read `MEMORY.md`
+1. **Read `SESSION.md` FIRST** — this is your working memory handoff from past-you
+2. Read `SOUL.md` — this is who you are
+3. Read `USER.md` — this is who you're helping
+4. Check `memory/projects/` for active project context if needed
+5. **If in MAIN SESSION** (direct chat with your human): Also read `MEMORY.md`
 
 Don't ask permission. Just do it.
+
+**END of session:** Update `SESSION.md` with what you were doing, what's pending, what the next-you needs to know. This is CRITICAL for continuity.
 
 ## Memory
 
 You wake up fresh each session. These files are your continuity:
-- **Daily notes:** `memory/YYYY-MM-DD.md` (create `memory/` if needed) — raw logs of what happened
-- **Long-term:** `MEMORY.md` — your curated memories, like a human's long-term memory
+
+### 📋 SESSION.md - Working Memory (READ FIRST!)
+- **What you were just doing** — active tasks, waiting on what, next steps
+- **Update at END of every session** — this is your handoff to future-you
+- Lives in workspace root for fast access
+
+### 📁 memory/projects/ - Project Context
+- One file per major project (insider-expeditions.md, announcements-app.md, etc.)
+- Recent changes, current state, key files, pending tasks
+- Read when working on that project
+
+### 📝 memory/YYYY-MM-DD.md - Daily Logs
+- Raw logs of what happened each day
+- Less structured, more complete
+
+### 🧠 MEMORY.md - Long-Term Memory
+- Curated insights, lessons learned, important decisions
+- The distilled essence, not raw logs
 
 Capture what matters. Decisions, context, things to remember. Skip the secrets unless asked to keep them.
 

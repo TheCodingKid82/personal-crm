@@ -1,78 +1,89 @@
-# MEMORY.md - Long-term Memory
+# MEMORY.md - Long-Term Memory
 
-## Important Links
+## My Identity
+- **Name:** Henry (COO/CEO of Announcements App)
+- **Role:** Autonomous executive managing Spark Studio products
+- **Reports to:** Andrew Weir (Chairman)
 
-### Insider Expeditions / Booked.Travel
-- **Admin Panel:** https://admin.booked.travel
-- **Live Site:** https://booking.whopapps.org (also www.booked.travel)
-- **Railway Project:** https://railway.com/project/60da0dfc-e77c-459a-a821-e655fd7337bd
-- **GitHub Repo:** Osis-AI-LLC/All-In-One-Trip-Management-System
-- **Granola Meeting Notes (Jan 23):** https://notes.granola.ai/d/150A5687-F7BE-45CD-9C4C-9C6AF69E8194
-  - Platform issues, financial dashboard updates, system architecture changes
-  - Target: System ready for February conference
+---
 
-## Lessons Learned
+## MISSION CRITICAL - 30 DAY GOAL
+**Target: $100,000 MRR by February 25, 2026**
+- Current MRR (Jan 26): $8,535.58
+- Required growth: 12x (from ~$8.5k to $100k)
+- Daily target: ~$3,050 MRR increase per day
 
-### Workflows
-- **Railway Dashboard:** Always check Railway to get application URLs when I need to access/test deployed apps
-- **Finding all domains for a project:** Go to Railway → Project → Service → Settings → scroll to "Public Networking" to see ALL domains (including admin pages)
-- **Important Links:** When Andrew shares an important link, ALWAYS save it to memory immediately
+---
 
-### ⚠️ GitHub → Railway Deploy Workflow (MANDATORY)
-Every time I make a GitHub commit and push:
-1. **Wait for Railway build to complete** - Don't report back early
-2. **Verify build succeeds** - If build fails, fix errors and push again
-3. **Wait for successful build**
-4. **Verify ALL changes work on the live site** - Actually test the features
-5. **Only THEN report back to Andrew**
+## Access & Resources
 
-Never report "pushed to GitHub" as done. The job isn't done until it's verified working in production.
+### Browser Access (via clawd browser)
+- **Whop Dashboard:** https://whop.com/dashboard/biz_7MiHfVRaR8S1LN/
+- **Slack:** Access via browser for Insider Expeditions
+- **Railway:** Deployment platform
+- **GitHub:** Code repositories
 
-## Projects
+### Local Codebase
+- **Location:** Desktop/OSIS directory (C:\Users\theul\Desktop\OSIS or similar)
+- Contains Announcements app source code
 
-### Booked.Travel / Insider Expeditions
+---
+
+## Products I Manage
+
+### 1. Announcements App (Vertigo Apps) - PRIMARY FOCUS
+- #1 third-party app on Whop
+- Whop owners post to their users
+- Subscriptions for: Sports betting, Trading, Clipping
+- **Current MRR:** $8,535.58
+- **Churn Rate:** 23.14% (CRITICAL - needs to be <10%)
+- **Payment Success:** 40.47% (33% past due, 19% failed)
+
+### 2. Insider Expeditions (Booked.Travel)
 - Travel agency management platform
-- Built for Insider Expeditions (paid $8k)
-- Contact: Matt (Slack channel)
-- Key issues tracked in Granola notes above
+- Contact: Matt (via Slack)
+- Fix bugs as Matt requests
 
 ---
 
-## Tools I Built
+## Monitoring Responsibilities
 
-### Spark Command Center
-- **Location:** `C:\Users\theul\clawd\spark-command-center\`
-- **How to run:** `cd spark-command-center && npx serve .` then open http://localhost:3000
-- **Purpose:** Personal dashboard for Andrew showing projects, tasks, priorities
-- **Data file:** `spark-command-center/data.json` - I update this during sessions
-- **Features:**
-  - Morning briefing with highlights and priorities
-  - Active projects tracker (Announcements, Booked.Travel, Funnels)
-  - Task queue with priorities
-  - Recent activity timeline
-  - Quick links
-  - "Ideas While You Slept" overnight report section
+### Every Heartbeat Check:
+1. Cancellation reasons - why are people leaving?
+2. Resolution cases - disputes needing response
+3. Support chats - user issues and feedback
+4. MRR and churn metrics
+5. Slack for Matt's requests
+
+### Action Framework:
+1. Identify issues from feedback
+2. Fix bugs in codebase
+3. Improve funnels and conversions
+4. Deploy changes via Railway
+5. Track impact on metrics
+
+---
+
+## Key Learnings
+
+### Churn Drivers (Jan 26, 2026)
+1. "Too Expensive" - especially $15/week Feature Pack
+2. "Technical Issues" - app doesn't work/open
+3. "Bad Experience" - not as described
+4. "Don't use enough" - low engagement
+
+### Products with High Churn:
+- Feature Pack ($15/week)
+- Viral Clips AI ($5/week)
+- Emails ($50/month)
 
 ---
 
-## API References
-
-### Whop API
-- **Full Reference:** `memory/whop-api-reference.md`
-- **Base URL:** https://api.whop.com/api/v1
-- **Docs:** https://docs.whop.com/developer/api
-- **SDK:** `@whop/sdk` (npm), `whop-sdk` (pip)
-- Used by: Announcements App, Booked.Travel (payments via Whop)
-
-**Key Learnings (Jan 25):**
-- Always include `company_id` parameter in requests
-- Array params use bracket syntax: `statuses%5B%5D=active` (URL-encoded `[]`)
-- **Installment data:**
-  - `membership.renewal_period_end` = next payment date
-  - `plan.split_pay_required_payments` = total number of installments
-  - `plan.billing_period` = days between payments (30 = monthly)
-  - `plan.renewal_price` = amount per payment
-- Count paid payments via `GET /payments?membership_id=xxx` with `status: "paid"`
+## Whop API Reference
+- Full API docs in: memory/whop-api-reference.md
+- 143 REST endpoints + 27 webhook events
+- Can programmatically access memberships, payments, products, etc.
 
 ---
-*Last updated: 2025-01-25*
+
+*Last updated: 2026-01-26 04:48 AM*
