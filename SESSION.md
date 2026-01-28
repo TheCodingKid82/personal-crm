@@ -1,31 +1,38 @@
 # SESSION.md - Working Memory
 
-## Last Updated: 2026-01-28 ~4:30 AM EST
+## Last Updated: 2026-01-28 ~3:00 PM EST
 
-## ✅ Agent Factory — Core Complete
-Built and tested the full Agent Factory system overnight. E2E test passed.
+## Current Status
+✅ **Agent Factory Dashboard DEPLOYED**
+- URL: https://command-center-production-3605.up.railway.app
+- GitHub: https://github.com/TheCodingKid82/spark-agent-dashboard
+- Railway Service: command-center in "Spark Studio Agents" project
 
-### What's Done:
-- **Railway provisioning** — API-based: serviceCreate → env vars → volume → domain → deploy. Uses port 8080.
-- **Workspace file generator** — SOUL.md, AGENTS.md, USER.md, IDENTITY.md, TOOLS.md, HEARTBEAT.md with 6 role templates (sales, support, dev, ops, marketing, custom)
-- **Knowledge base** — COMPANY.md, PRODUCTS.md, CONTACTS.md, PROCESSES.md, CODEBASE_MAP.md auto-included
-- **Gateway config** — file push via /tools/invoke, health checks, messaging, setup wizard automation
-- **Telegram** — bot token validation, webhook management (manual BotFather step documented)
-- **Dashboard API** — all routes: list, get, delete, status, message, tasks, provision
-- **Dashboard UI** — role template selector added to AddAgentModal
-- **Agent directory** — auto-generated on provision with all active agents
+## What Just Happened
+- Fixed multiple TypeScript errors that were blocking Railway build
+- Had issues with Railway webhook not picking up new commits
+- Eventually got it to build commit `6962d07` which passed
+- Dashboard is now live and serving requests
 
-### What's Left (for Andrew):
-- P8: Real email (need domain email provider setup)
-- P8: Real Whop accounts (need API access or browser automation)
-- Telegram bots created via @BotFather manually
-- Anthropic API key sharing (agents need key via /setup wizard)
-- Dashboard deploy to Railway for always-on access
+## Agent Factory Status
+See `memory/agent-factory-plan.md` for full details.
 
-### Key IDs:
-- **Project:** `25985985-f53d-4c2e-a9ff-c23e09716643`
-- **Env:** `7ae32d1d-c474-450b-b7f5-6f16e5d875cd`
-- **Dashboard:** `C:\Users\theul\clawd\agent-dashboard` (port 3000)
+### Complete:
+- P1: Railway provisioning (real deployments work)
+- P2: Workspace file generation (all templates)
+- P3: Agent directory auto-update
+- P4: Dashboard deployed to Railway
 
-### Test Results:
-Atlas agent provisioned → built → deployed → gateway live at railway.app → /health 200 → /setup 200 → cleaned up
+### Still Needs Andrew:
+- Anthropic setup token (run `claude setup token` and paste)
+- Real email/Whop accounts (deferred)
+- No Telegram bots for individual agents (per Andrew)
+
+## Reminders for Andrew
+- Email + Whop integration deferred (remind later)
+- Dashboard auto-deploys on GitHub push now
+
+## Next Session
+- Test the live dashboard
+- Provision a real agent through it
+- Set up Anthropic token for agents

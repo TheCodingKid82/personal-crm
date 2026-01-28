@@ -1,14 +1,11 @@
-# HEARTBEAT.md - Agent Factory Status
+# HEARTBEAT.md - Current Status
 
-## ✅ Core Build Complete (4:30 AM EST)
-The Agent Factory system is built and E2E tested.
-Full plan and status: `memory/agent-factory-plan.md`
+## ✅ Dashboard LIVE (2026-01-28 ~3:00 PM EST)
+**URL:** https://command-center-production-3605.up.railway.app
 
-### Remaining Tasks (non-blocking):
-- Commit all changes to git
-- Consider deploying dashboard to Railway
-- P8 (real email/Whop) needs Andrew's input on providers
+Agent Factory dashboard is deployed and working.
+Auto-deploys from GitHub on push.
 
-### If context compacted:
-Read `memory/agent-factory-plan.md` and `SESSION.md` for full status.
-The work is DONE unless Andrew requests changes.
+## Pending (needs Andrew):
+- Anthropic setup token for agents
+- Email/Whop integration (deferred)
