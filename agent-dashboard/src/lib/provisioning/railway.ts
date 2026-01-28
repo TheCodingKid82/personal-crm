@@ -28,13 +28,25 @@ interface ServiceInfo {
 // --- Config ---
 
 function getConfig() {
+  // Start command that:
+  // 1. Creates ~/.claude and ~/.clawdbot directories
+  // 2. Writes Claude credentials.json with the setup token
+  // 3. Writes Clawdbot config with trustedProxies for Railway
+  // 4. Starts the Clawdbot gateway
+  const defaultStartCommand = `sh -c '
+    mkdir -p ~/.claude ~/.clawdbot &&
+    echo "{\"claudeAiOauth\":{\"accessToken\":\"$ANTHROPIC_AUTH_TOKEN\",\"expiresAt\":9999999999999}}" > ~/.claude/.credentials.json &&
+    echo "{\"gateway\":{\"mode\":\"local\",\"trustedProxies\":[\"100.64.0.0/10\",\"10.0.0.0/8\",\"172.16.0.0/12\",\"192.168.0.0/16\"],\"auth\":{\"mode\":\"token\",\"token\":\"$CLAWDBOT_GATEWAY_TOKEN\"}},\"agents\":{\"defaults\":{\"workspace\":\"/data/workspace\"}},\"wizard\":{\"lastRunAt\":\"2026-01-01T00:00:00.000Z\",\"lastRunCommand\":\"provision\"}}" > ~/.clawdbot/clawdbot.json &&
+    node dist/index.js gateway --port 8080 --bind lan
+  '`;
+  
   return {
     token: process.env.RAILWAY_API_TOKEN || null,
     projectId: process.env.RAILWAY_PROJECT_ID || null,
     environmentId: process.env.RAILWAY_ENVIRONMENT_ID || '7ae32d1d-c474-450b-b7f5-6f16e5d875cd',
     workspaceId: process.env.RAILWAY_WORKSPACE_ID || null,
     sourceRepo: process.env.RAILWAY_SOURCE_REPO || 'clawdbot/clawdbot',
-    startCommand: process.env.RAILWAY_START_COMMAND || 'node dist/index.js gateway --allow-unconfigured --port 8080 --bind lan',
+    startCommand: process.env.RAILWAY_START_COMMAND || defaultStartCommand,
   };
 }
 
@@ -97,12 +109,12 @@ function sanitizeServiceName(name: string): string {
  * Deploy a new Clawdbot agent as a service in the shared project.
  * 
  * Steps:
- * 1. serviceCreate with source.repo
+ * 1. serviceCreate with source.repo (doesn't auto-build)
  * 2. serviceInstanceUpdate — set start command
  * 3. variableCollectionUpsert — push env vars
  * 4. volumeCreate — /data mount
  * 5. serviceDomainCreate — public URL
- * 6. serviceInstanceDeploy — trigger build
+ * 6. serviceInstanceDeploy — trigger build (env vars already set!)
  */
 export async function provisionFullStack(
   agentName: string,
@@ -156,8 +168,8 @@ export async function provisionFullStack(
       input: { startCommand: config.startCommand },
     });
 
-    // Step 3: Set environment variables
-    const setupPassword = generateGatewayToken(); // reuse for setup password
+    // Step 3: Set environment variables (BEFORE triggering deploy)
+    const setupPassword = generateGatewayToken();
     const envVars: Record<string, string> = {
       CLAWDBOT_STATE_DIR: '/data/.clawdbot',
       CLAWDBOT_WORKSPACE_DIR: '/data/workspace',
@@ -168,6 +180,8 @@ export async function provisionFullStack(
       AGENT_NAME: agentName,
       AGENT_ROLE: agentRole,
       AGENT_PURPOSE: agentPurpose,
+      // Anthropic setup token for auto-pairing
+      ANTHROPIC_AUTH_TOKEN: process.env.ANTHROPIC_SETUP_TOKEN || '',
       ...(extraVars || {}),
     };
 
@@ -212,7 +226,7 @@ export async function provisionFullStack(
 
     const domain = domainData.serviceDomainCreate.domain;
 
-    // Step 6: Trigger deployment
+    // Step 6: Trigger deployment (env vars are already set!)
     await railwayQuery(`
       mutation($serviceId: String!, $environmentId: String!) {
         serviceInstanceDeploy(serviceId: $serviceId, environmentId: $environmentId)
