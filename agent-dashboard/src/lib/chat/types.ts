@@ -31,12 +31,13 @@ export interface Conversation {
 export interface AgentInfo {
   id: string;
   name: string;
-  role: string;
-  purpose: string;
+  role?: string;
+  purpose?: string;
   gatewayUrl: string;
   gatewayToken: string;
-  status: 'online' | 'offline' | 'busy';
+  status?: 'online' | 'offline' | 'busy' | 'unknown';
   capabilities?: string[];
+  lastSeen?: number;
 }
 
 export interface TeamRoster {
@@ -66,4 +67,5 @@ export interface SendMessageResponse {
   messageId?: string;
   error?: string;
   agentResponse?: string;  // If agent responds immediately
+  teamResponses?: { agent: string; response: string }[];  // Team chat responses
 }

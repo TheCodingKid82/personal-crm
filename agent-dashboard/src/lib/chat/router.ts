@@ -14,6 +14,7 @@ async function sendToGateway(
   agent: AgentInfo,
   message: string,
   fromAgent?: string,
+  fromId?: string,
 ): Promise<{ success: boolean; response?: string; error?: string }> {
   try {
     // Format the message with sender context
@@ -21,15 +22,27 @@ async function sendToGateway(
       ? `[Message from ${fromAgent}]: ${message}`
       : message;
 
-    const response = await fetch(`https://${agent.gatewayUrl}/api/chat`, {
+    // gatewayUrl already includes protocol (https://...)
+    const baseUrl = agent.gatewayUrl.startsWith('http') ? agent.gatewayUrl : `https://${agent.gatewayUrl}`;
+    
+    // Create a consistent session key based on sender
+    // This ensures the same sender always gets the same session
+    const sessionKey = fromId 
+      ? `command-center:${fromId}:${agent.id}`
+      : `command-center:default:${agent.id}`;
+    
+    // Use Clawdbot's OpenResponses API endpoint
+    const response = await fetch(`${baseUrl}/v1/responses`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${agent.gatewayToken}`,
+        'x-clawdbot-agent-id': 'main',
+        'x-clawdbot-session-key': sessionKey,
       },
       body: JSON.stringify({
-        message: formattedMessage,
-        sessionKey: 'main',  // Use main session
+        model: 'clawdbot:main',
+        input: formattedMessage,
       }),
     });
 
@@ -39,7 +52,22 @@ async function sendToGateway(
     }
 
     const data = await response.json();
-    return { success: true, response: data.response || data.message };
+    
+    // Extract text from OpenResponses format
+    let responseText = '';
+    if (data.output && Array.isArray(data.output)) {
+      for (const item of data.output) {
+        if (item.type === 'message' && item.content) {
+          for (const content of item.content) {
+            if (content.type === 'output_text') {
+              responseText += content.text;
+            }
+          }
+        }
+      }
+    }
+    
+    return { success: true, response: responseText || 'No response' };
   } catch (error) {
     return { success: false, error: String(error) };
   }
@@ -75,7 +103,7 @@ export async function sendMessage(req: SendMessageRequest): Promise<SendMessageR
       fromName = 'Andrew (Founder)';
     }
 
-    const result = await sendToGateway(agent, content, fromName);
+    const result = await sendToGateway(agent, content, fromName, from);
     
     if (result.success && result.response) {
       // Store agent's response
@@ -105,18 +133,78 @@ export async function sendMessage(req: SendMessageRequest): Promise<SendMessageR
     };
   }
 
-  // Broadcast to all agents
+  // Broadcast to all agents (Team Chat)
   if (to === 'broadcast') {
     const agents = await store.getAllAgents();
-    const results = await Promise.all(
-      agents.map(agent => sendToGateway(agent, content, from))
-    );
     
-    const failures = results.filter(r => !r.success);
+    // Get recent team chat history for context
+    const recentMessages = await store.getBroadcastMessages(10);
+    
+    // Build conversation context
+    const agentNames = agents.map(a => a.name).join(', ');
+    let conversationHistory = '';
+    if (recentMessages.length > 1) {
+      // Skip the message we just added
+      const previousMessages = recentMessages.slice(0, -1).slice(-5);
+      if (previousMessages.length > 0) {
+        conversationHistory = '\n\n--- Recent Team Chat History ---\n' +
+          previousMessages.map(m => {
+            const senderName = m.from === 'andrew' ? 'Andrew' : 
+              agents.find(a => a.id === m.from)?.name || m.from;
+            return `${senderName}: ${m.content.slice(0, 200)}${m.content.length > 200 ? '...' : ''}`;
+          }).join('\n') +
+          '\n--- End History ---\n';
+      }
+    }
+    
+    // Format the team chat message
+    const senderName = from === 'andrew' ? 'Andrew (Co-founder)' : 
+      (agents.find(a => a.id === from)?.name || from);
+    
+    const teamChatMessage = `📢 TEAM CHAT (All Agents Present: ${agentNames})
+${conversationHistory}
+${senderName}: ${content}
+
+---
+TEAM CHAT RULES:
+- This is a group chat. Everyone can see everything.
+- DO NOT reply unless: you're directly addressed, asked a question, or have something specifically relevant to add.
+- If the message is general or for someone else, reply with just: [no response needed]
+- If you're mentioned by name or role, respond helpfully.
+- Keep responses concise. This is chat, not a report.
+- React naturally like you would in a real team Slack channel.`;
+    
+    // Send to all agents and collect responses
+    const responses: { agent: string; response: string }[] = [];
+    
+    for (const agent of agents) {
+      const result = await sendToGateway(agent, teamChatMessage, senderName, from);
+      if (result.success && result.response) {
+        // Skip "[no response needed]" or similar non-responses
+        const response = result.response.trim();
+        const isNoResponse = response.toLowerCase().includes('[no response needed]') ||
+                            response.toLowerCase().includes('no response needed') ||
+                            response === '' ||
+                            response.length < 5;
+        
+        if (!isNoResponse) {
+          responses.push({ agent: agent.name, response: response });
+          
+          // Store each agent's response as a broadcast message
+          await store.addMessage({
+            from: agent.id,
+            to: 'broadcast',
+            content: response,
+            type: 'text',
+          });
+        }
+      }
+    }
+    
     return {
-      success: failures.length === 0,
+      success: true,
       messageId: sentMessage.id,
-      error: failures.length > 0 ? `${failures.length} agents failed to receive` : undefined,
+      teamResponses: responses,
     };
   }
 

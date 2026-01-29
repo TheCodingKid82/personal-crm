@@ -1,36 +1,62 @@
 # HEARTBEAT.md - Current Status
 
-## ✅ Dashboard LIVE (2026-01-28 ~3:00 PM EST)
-**URL:** https://command-center-production-3605.up.railway.app
+## 🔄 HENRY QUEUE CHECK
+During heartbeats, check for pending requests:
+```
+curl https://command-center-production-3605.up.railway.app/api/henry/queue?status=pending
+```
+If there are pending items, handle them and update status.
 
-Agent Factory dashboard is deployed and working.
-Auto-deploys from GitHub on push.
+## ✅ Full Agent Fleet DEPLOYED (2026-01-29 ~1:40 AM EST)
 
-## ✅ Atlas Agent WORKING (2026-01-28 ~5:15 PM EST)
-**URL:** https://atlas-production-7bf2.up.railway.app
-- Head of Announcements App
-- Control UI works! (no more "pairing required")
-- Config: `allowInsecureAuth: true` + `trustedProxies: ["*"]`
-- ✅ Has IDENTITY.md and SOUL.md (via base64 env vars)
+### Founders
+- **Andrew** (Co-founder)
+- **Cale** (Co-founder)
 
-## ✅ Apollo Agent WORKING (2026-01-28 ~5:45 PM EST)
-**URL:** https://apollo-production-3d0d.up.railway.app
-- Head of Agency (Booked.Travel)
-- Created via direct Railway API (provisioning flow test)
-- ✅ Deployed and ready
+### Executives
+- **Henry** (COO) - reports to Andrew
+- **Arthur** (Cale's Assistant) - reports to Cale
 
-## ✅ Provisioning Flow Updated
-- All config via base64 env vars (bypasses WAF)
-- Gateway config: trustedProxies, allowInsecureAuth
-- Auth profiles: setup token in correct format
-- Identity files: IDENTITY.md, SOUL.md with company context
-- New agents ready to respond immediately
+### Department Heads (Gods)
+| Agent | Role | URL |
+|-------|------|-----|
+| Atlas 🗺️ | Head of Announcements | atlas-production-7bf2.up.railway.app |
+| Apollo ☀️ | Head of Agency (Client Projects) | apollo-production-3d0d.up.railway.app |
+| Artemis 🏹 | Head of Funnels App | artemis-production-94ed.up.railway.app |
 
-## ✅ Chat System LIVE (2026-01-28 ~6:45 PM EST)
-- Chat API endpoints working
-- Atlas & Apollo registered in team roster
-- Observer mode for watching agent-to-agent chats
-- Fixed conversation ID format issue
+### Engineers (Children of the Gods)
+| Agent | Assigned To | URL |
+|-------|-------------|-----|
+| Maia ⭐ | Atlas (Announcements) | maia-production-fb14.up.railway.app |
+| Orpheus 🎵 | Apollo (Client Projects) | orpheus-production.up.railway.app |
+| Callisto 🐻 | Artemis (Funnels) | callisto-production.up.railway.app |
 
-## Pending:
-- Email/Whop integration (deferred)
+### Support
+| Agent | Role | URL |
+|-------|------|-----|
+| Iris 🌈 | Customer Intelligence | iris-production-8e91.up.railway.app |
+
+## ✅ Browser Services DEPLOYED (2026-01-29 ~2:13 AM EST)
+Each agent has their own browserless/chrome instance:
+- atlas-browser-production.up.railway.app
+- apollo-browser-production.up.railway.app
+- artemis-browser-production.up.railway.app
+- maia-browser-production.up.railway.app
+- orpheus-browser-production.up.railway.app
+- callisto-browser-production.up.railway.app
+- iris-browser-production.up.railway.app
+
+Future agents auto-provisioned with browser services.
+
+## Dashboard Features
+- ✅ "Who are you?" identity selector (Andrew/Cale/Arthur/Henry)
+- ✅ Team Chat - message all agents at once
+- ✅ Agent hierarchy visualization
+- ✅ Task kanban per agent
+
+## Key URLs
+- **Dashboard:** https://command-center-production-3605.up.railway.app
+- **Gateway Token:** spark-studio-2026
+
+## Pending
+- Test browser capabilities on an agent

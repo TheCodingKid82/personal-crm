@@ -25,12 +25,11 @@ import AddAgentModal from "./AddAgentModal";
 import ChatPanel from "./chat/ChatPanel";
 import MeetingScheduler from "./chat/MeetingScheduler";
 import UpcomingMeetings from "./chat/UpcomingMeetings";
+import WhoAreYouModal, { getUserIdentity, type UserIdentity } from "./WhoAreYouModal";
 
 const nodeTypes: NodeTypes = {
   agent: AgentNode as unknown as NodeTypes["agent"],
 };
-
-const CURRENT_USER_ID = "andrew";
 
 function getDmChatId(agentA: string, agentB: string): string {
   const sorted = [agentA, agentB].sort();
@@ -86,13 +85,29 @@ function buildNodesAndEdges(
   const VERTICAL_GAP = 200;
   const HORIZONTAL_GAP = 280;
 
+  // Separate support agents (like Iris) to position them on the left
+  const supportAgentIds = new Set(['iris']);
+  
   Object.entries(levelsCount).forEach(([levelStr, ids]) => {
     const level = parseInt(levelStr);
-    const totalWidth = (ids.length - 1) * HORIZONTAL_GAP;
+    // Filter out support agents from main layout
+    const mainIds = ids.filter(id => !supportAgentIds.has(id));
+    const supportIds = ids.filter(id => supportAgentIds.has(id));
+    
+    // Position main agents centered
+    const totalWidth = (mainIds.length - 1) * HORIZONTAL_GAP;
     const startX = -totalWidth / 2;
-    ids.forEach((id, i) => {
+    mainIds.forEach((id, i) => {
       positions[id] = {
         x: startX + i * HORIZONTAL_GAP,
+        y: level * VERTICAL_GAP,
+      };
+    });
+    
+    // Position support agents to the far left
+    supportIds.forEach((id, i) => {
+      positions[id] = {
+        x: startX - HORIZONTAL_GAP * 1.5 - (i * HORIZONTAL_GAP),
         y: level * VERTICAL_GAP,
       };
     });
@@ -155,12 +170,12 @@ function buildNodesAndEdges(
   return { nodes, edges };
 }
 
-// Core agents that always exist (you + Henry)
+// Core agents that always exist (founders + their assistants)
 const CORE_AGENTS: Agent[] = [
   {
     id: "andrew",
     name: "Andrew",
-    role: "Founder & CEO",
+    role: "Co-founder",
     emoji: "👑",
     status: "online",
     purpose: "Vision, strategy, and final decisions. The human behind Spark Studio.",
@@ -171,17 +186,43 @@ const CORE_AGENTS: Agent[] = [
     metrics: { tasksCompleted: 0, uptime: "100%", lastActive: new Date().toISOString() },
   },
   {
+    id: "cale",
+    name: "Cale",
+    role: "Co-founder",
+    emoji: "🚀",
+    status: "online",
+    purpose: "Co-founder focused on Funnels App development with Arthur.",
+    specialties: ["Funnels App", "Product Development", "Technical Strategy"],
+    parentId: null,
+    recentActivity: [],
+    communications: [],
+    metrics: { tasksCompleted: 0, uptime: "100%", lastActive: new Date().toISOString() },
+  },
+  {
     id: "henry",
     name: "Henry",
-    role: "COO / Executive Assistant",
+    role: "COO",
     emoji: "🎯",
     status: "online",
-    purpose: "Operations command center. Manages agents, coordinates tasks, handles Announcements app.",
-    specialties: ["Operations", "Coordination", "Announcements App", "Agent Management"],
+    purpose: "Operations command center. Manages agents, coordinates tasks, runs operations for Andrew.",
+    specialties: ["Operations", "Coordination", "Agent Management", "Strategy Execution"],
     parentId: "andrew",
     recentActivity: [],
     communications: [],
     metrics: { tasksCompleted: 0, uptime: "99.7%", lastActive: new Date().toISOString() },
+  },
+  {
+    id: "arthur",
+    name: "Arthur",
+    role: "Cale's Assistant",
+    emoji: "🤖",
+    status: "online",
+    purpose: "Cale's executive assistant. Supports Funnels App development, collaborates with Henry.",
+    specialties: ["Funnels App", "Development Support", "Coordination with Henry"],
+    parentId: "cale",
+    recentActivity: [],
+    communications: [],
+    metrics: { tasksCompleted: 0, uptime: "99.5%", lastActive: new Date().toISOString() },
   },
 ];
 
@@ -196,6 +237,13 @@ export default function Dashboard() {
   const [recentEdges, setRecentEdges] = useState<Set<string>>(new Set());
   const [unreadCount, setUnreadCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [currentUserId, setCurrentUserId] = useState<UserIdentity | null>(null);
+
+  // Check for existing identity on mount
+  useEffect(() => {
+    const existing = getUserIdentity();
+    if (existing) setCurrentUserId(existing);
+  }, []);
 
   // Fetch real agents from Railway on mount
   useEffect(() => {
@@ -205,6 +253,20 @@ export default function Dashboard() {
         if (res.ok) {
           const data = await res.json();
           if (data.agents && Array.isArray(data.agents)) {
+            // Agent hierarchy mapping
+            const agentHierarchy: Record<string, { parentId: string; emoji: string }> = {
+              // Heads report to Henry
+              atlas: { parentId: 'henry', emoji: '🗺️' },
+              apollo: { parentId: 'henry', emoji: '☀️' },
+              artemis: { parentId: 'henry', emoji: '🏹' },
+              // Engineers report to their respective heads
+              maia: { parentId: 'atlas', emoji: '⭐' },
+              orpheus: { parentId: 'apollo', emoji: '🎵' },
+              callisto: { parentId: 'artemis', emoji: '🐻' },
+              // Support reports to Henry but positioned separately
+              iris: { parentId: 'henry', emoji: '🌈' },
+            };
+
             // Convert Railway records to Agent format
             const railwayAgents: Agent[] = data.agents.map((record: {
               agentId: string;
@@ -219,32 +281,35 @@ export default function Dashboard() {
               provisionedAt?: string;
               railwayProjectId?: string;
               railwayServiceId?: string;
-            }) => ({
-              id: record.agentId,
-              name: record.agentName,
-              role: record.agentRole || record.roleTemplate || 'Agent',
-              emoji: '🤖',
-              status: record.liveStatus === 'SUCCESS' ? 'online' : 'offline',
-              purpose: record.agentPurpose || `Provisioned agent`,
-              specialties: [],
-              parentId: 'henry', // All provisioned agents report to Henry
-              recentActivity: [],
-              communications: [],
-              metrics: {
-                tasksCompleted: 0,
-                uptime: record.liveStatus === 'SUCCESS' ? '100%' : '0%',
-                lastActive: record.provisionedAt || new Date().toISOString(),
-              },
-              infrastructure: {
-                railwayProjectId: record.railwayProjectId,
-                railwayServiceId: record.railwayServiceId,
-                railwayUrl: record.railwayProjectId ? `https://railway.app/project/${record.railwayProjectId}` : undefined,
-                railwayStatus: record.liveStatus,
-                gatewayUrl: record.gatewayUrl || (record.domain ? `https://${record.domain}` : undefined),
-                gatewayToken: record.gatewayToken,
-                provisionedAt: record.provisionedAt,
-              },
-            }));
+            }) => {
+              const hierarchy = agentHierarchy[record.agentId] || { parentId: 'henry', emoji: '🤖' };
+              return {
+                id: record.agentId,
+                name: record.agentName,
+                role: record.agentRole || record.roleTemplate || 'Agent',
+                emoji: hierarchy.emoji,
+                status: record.liveStatus === 'SUCCESS' ? 'online' : 'offline',
+                purpose: record.agentPurpose || `Provisioned agent`,
+                specialties: [],
+                parentId: hierarchy.parentId,
+                recentActivity: [],
+                communications: [],
+                metrics: {
+                  tasksCompleted: 0,
+                  uptime: record.liveStatus === 'SUCCESS' ? '100%' : '0%',
+                  lastActive: record.provisionedAt || new Date().toISOString(),
+                },
+                infrastructure: {
+                  railwayProjectId: record.railwayProjectId,
+                  railwayServiceId: record.railwayServiceId,
+                  railwayUrl: record.railwayProjectId ? `https://railway.app/project/${record.railwayProjectId}` : undefined,
+                  railwayStatus: record.liveStatus,
+                  gatewayUrl: record.gatewayUrl || (record.domain ? `https://${record.domain}` : undefined),
+                  gatewayToken: record.gatewayToken,
+                  provisionedAt: record.provisionedAt,
+                },
+              };
+            });
             // Merge core agents with Railway agents (avoid duplicates)
             const railwayIds = new Set(railwayAgents.map(a => a.id));
             const merged = [
@@ -270,7 +335,7 @@ export default function Dashboard() {
   // Open DM from agent node chat icon
   const handleChatClick = useCallback(
     (agentId: string) => {
-      const dmId = getDmChatId(CURRENT_USER_ID, agentId);
+      const dmId = getDmChatId(currentUserId || 'andrew', agentId);
       setInitialChatId(dmId);
       setShowChat(true);
     },
@@ -352,6 +417,11 @@ export default function Dashboard() {
 
   return (
     <div className="h-screen w-screen flex flex-col bg-[#0a0a0f] overflow-hidden">
+      {/* Identity selector modal */}
+      {!currentUserId && (
+        <WhoAreYouModal onSelect={(id) => setCurrentUserId(id)} />
+      )}
+      
       <TopBar
         agents={agents}
         onAddAgent={() => setShowAddModal(true)}
@@ -441,7 +511,7 @@ export default function Dashboard() {
         isOpen={showChat}
         onClose={handleCloseChat}
         initialChatId={initialChatId}
-        currentUserId={CURRENT_USER_ID}
+        currentUserId={currentUserId || 'andrew'}
       />
 
       {/* Meeting Scheduler */}

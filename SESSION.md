@@ -1,37 +1,54 @@
-# SESSION.md - Working Memory
+# SESSION.md - Working Memory Handoff
 
-## Last Updated: 2026-01-28 ~8:10 PM EST
+## Last Updated: 2026-01-29 ~4:00 PM EST
+
+## What Was Happening
+Andrew and I spent most of the day getting browser access working for the agent fleet. Long debugging session.
 
 ## Current State
 
-### Agent Factory
-- ✅ Dashboard, Atlas, Apollo all deployed and working
-- ✅ Chat system live with observer mode
-- ✅ Provisioning flow complete
+### Agent Fleet Browser Status
+- **Navigation WORKS**: `browser(action="navigate", profile="remote", targetUrl="...")`
+- **Tabs WORK**: `browser(action="tabs", profile="remote")`
+- **Screenshots BROKEN**: Port conflict issue with remote CDP in Moltbot beta
 
-### Booked.Travel
-- ✅ ResourceViewer with adjustable preview mode
-- ✅ Resource usage shows decimal units
-- ✅ Payment metadata includes additional participants
+### Key Config (in CLAWDBOT_CONFIG_B64 env var)
+```json
+"browser": {
+  "enabled": true,
+  "defaultProfile": "remote", 
+  "profiles": {
+    "remote": {
+      "cdpUrl": "https://[agent]-browser-production.up.railway.app"
+    }
+  }
+}
+```
 
-## Recent Work (Today)
-1. Fixed agent auth/pairing issues
-2. Built inter-agent chat system
-3. Created ResourceViewer for Booked.Travel
-4. Fixed resource usage display (decimal units)
-5. Added participant info to payment metadata
+### All Agents Updated
+- TOOLS.md updated to use `profile="remote"`
+- Config deployed via Railway env vars
+- All 7 agents + 7 browser services running
 
-## Pending
-- Email/Whop integrations for agents (deferred)
-- Give Atlas and Apollo actual tasks
-- Connect agents to communication channels
+## Pending Tasks
 
-## Key URLs
-- Dashboard: https://command-center-production-3605.up.railway.app
-- Atlas: https://atlas-production-7bf2.up.railway.app
-- Apollo: https://apollo-production-3d0d.up.railway.app
+### Booked.Travel (Ready to Deploy)
+- Email fix investigation complete
+- "Resend Confirmation" button added
+- Code in `temp-booked` - needs git push and deploy
+- Root cause: Check `EMAIL_PROVIDER` env var on admin deployment
 
-## Notes for Next Session
-- Andrew tested ResourceViewer and resource usage display
-- May need to populate resource capacity field in PackageResource for accurate calculations
-- Chat system ready but needs real agent-to-agent communication testing
+### Browser Screenshots
+- Still broken on remote CDP
+- May need Moltbot update or different approach
+- Navigation works fine for now
+
+## Andrew's State
+- Went to sleep frustrated (~3:40 PM)
+- Night owl schedule - usually wakes 10am-3pm
+- Will likely want to test browser when he wakes up
+
+## Important Context
+- Agents run Moltbot v2026.1.27-beta.1 (NOT Clawdbot)
+- Agents reject config changes from other agents (security feature)
+- Must use Railway env vars to update agent configs

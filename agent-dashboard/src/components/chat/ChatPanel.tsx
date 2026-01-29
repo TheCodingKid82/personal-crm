@@ -95,6 +95,9 @@ export default function ChatPanel({ agents, isOpen, onClose, initialChatId, curr
       let url = '/api/chat/messages?';
       if (viewMode === 'observer') {
         url += 'all=true&limit=200';
+      } else if (selectedConv === 'team-chat') {
+        // Load all broadcast messages
+        url += 'broadcast=true&limit=100';
       } else if (selectedConv) {
         // Handle both formats: "dm-andrew-atlas" and "andrew:atlas"
         let parts: string[];
@@ -127,16 +130,25 @@ export default function ChatPanel({ agents, isOpen, onClose, initialChatId, curr
   async function sendMessage() {
     if (!newMessage.trim() || !selectedConv) return;
     
+    // Handle team chat (broadcast to all agents)
+    const isTeamChat = selectedConv === 'team-chat';
+    
     // Extract recipient from conversation ID
-    // Handle both formats: "dm-andrew-atlas" and "andrew:atlas"
-    let parts: string[];
-    if (selectedConv.startsWith('dm-')) {
-      parts = selectedConv.replace('dm-', '').split('-');
+    let recipient: string;
+    if (isTeamChat) {
+      recipient = 'broadcast';
     } else {
-      parts = selectedConv.split(':');
+      // Handle both formats: "dm-andrew-atlas" and "andrew:atlas"
+      let parts: string[];
+      if (selectedConv.startsWith('dm-')) {
+        parts = selectedConv.replace('dm-', '').split('-');
+      } else {
+        parts = selectedConv.split(':');
+      }
+      const found = parts.find(p => p !== currentUserId);
+      if (!found) return;
+      recipient = found;
     }
-    const recipient = parts.find(p => p !== currentUserId);
-    if (!recipient) return;
 
     setSending(true);
     try {
@@ -164,7 +176,7 @@ export default function ChatPanel({ agents, isOpen, onClose, initialChatId, curr
         };
         setMessages(prev => [...prev, newMsg]);
         
-        // If agent responded, add that too
+        // If agent responded (direct DM), add that too
         if (data.agentResponse) {
           const responseMsg: ChatMessage = {
             id: `resp-${Date.now()}`,
@@ -177,6 +189,28 @@ export default function ChatPanel({ agents, isOpen, onClose, initialChatId, curr
           setTimeout(() => {
             setMessages(prev => [...prev, responseMsg]);
           }, 500);
+        }
+        
+        // If team chat responses, add each agent's response
+        if (data.teamResponses && data.teamResponses.length > 0) {
+          const agentIdByName = (name: string) => {
+            const agent = agents.find(a => a.name === name);
+            return agent?.id || name.toLowerCase();
+          };
+          
+          data.teamResponses.forEach((tr: { agent: string; response: string }, i: number) => {
+            const responseMsg: ChatMessage = {
+              id: `team-resp-${Date.now()}-${i}`,
+              timestamp: Date.now() + 100 + (i * 100),
+              from: agentIdByName(tr.agent),
+              to: 'broadcast',
+              content: tr.response,
+              type: 'text',
+            };
+            setTimeout(() => {
+              setMessages(prev => [...prev, responseMsg]);
+            }, 500 + (i * 300)); // Stagger responses
+          });
         }
       } else {
         alert('Failed to send: ' + (data.error || 'Unknown error'));
@@ -268,9 +302,27 @@ export default function ChatPanel({ agents, isOpen, onClose, initialChatId, curr
         <div className="flex flex-1 overflow-hidden">
           {/* Sidebar */}
           <div className="w-64 border-r border-gray-800 flex flex-col bg-[#0a0a0f]">
+            {/* Team Chat - All Hands */}
+            <div className="p-3 border-b border-gray-800">
+              <button
+                onClick={() => { setSelectedConv('team-chat'); setViewMode('conversations'); }}
+                className={`w-full px-3 py-2 rounded-lg text-sm flex items-center gap-2 transition-colors ${
+                  selectedConv === 'team-chat'
+                    ? 'bg-indigo-600 text-white'
+                    : 'bg-gradient-to-r from-indigo-600/20 to-purple-600/20 hover:from-indigo-600/30 hover:to-purple-600/30 text-indigo-300 border border-indigo-500/30'
+                }`}
+              >
+                <span className="text-lg">🏛️</span>
+                <div className="text-left">
+                  <div className="font-medium">Team Chat</div>
+                  <div className="text-xs opacity-70">Message all agents at once</div>
+                </div>
+              </button>
+            </div>
+
             {/* Agent Quick Start */}
             <div className="p-3 border-b border-gray-800">
-              <div className="text-xs text-gray-500 mb-2">Start new chat:</div>
+              <div className="text-xs text-gray-500 mb-2">Direct message:</div>
               <div className="flex flex-wrap gap-1.5">
                 {agents.filter(a => a.id !== currentUserId).map(agent => (
                   <button
@@ -345,6 +397,11 @@ export default function ChatPanel({ agents, isOpen, onClose, initialChatId, curr
                     <Eye className="w-4 h-4 text-indigo-400" />
                     Observer Mode - All Agent Communications
                   </>
+                ) : selectedConv === 'team-chat' ? (
+                  <>
+                    <span>🏛️</span>
+                    Team Chat - All Agents
+                  </>
                 ) : selectedRecipient ? (
                   <>
                     <span>{getAgentEmoji(selectedRecipient)}</span>
@@ -356,7 +413,12 @@ export default function ChatPanel({ agents, isOpen, onClose, initialChatId, curr
               </h3>
               {viewMode === 'observer' && (
                 <p className="text-xs text-gray-500 mt-0.5">
-                  See all agent-to-agent messages (they don't know you're watching)
+                  See all agent-to-agent messages (they don&apos;t know you&apos;re watching)
+                </p>
+              )}
+              {selectedConv === 'team-chat' && (
+                <p className="text-xs text-gray-500 mt-0.5">
+                  Your message will be sent to all agents simultaneously
                 </p>
               )}
             </div>
@@ -386,10 +448,12 @@ export default function ChatPanel({ agents, isOpen, onClose, initialChatId, curr
                           : 'bg-gray-800 text-gray-100'
                       }`}
                     >
-                      {viewMode === 'observer' && (
+                      {/* Show sender info in observer mode or team chat */}
+                      {(viewMode === 'observer' || selectedConv === 'team-chat') && msg.from !== currentUserId && (
                         <div className="text-xs opacity-70 mb-1 flex items-center gap-1">
                           <span>{getAgentEmoji(msg.from)}</span>
-                          {getAgentName(msg.from)} → {getAgentName(msg.to)}
+                          <span className="font-medium">{getAgentName(msg.from)}</span>
+                          {viewMode === 'observer' && <span>→ {getAgentName(msg.to)}</span>}
                         </div>
                       )}
                       <div className="text-sm whitespace-pre-wrap">{msg.content}</div>
@@ -402,7 +466,7 @@ export default function ChatPanel({ agents, isOpen, onClose, initialChatId, curr
             </div>
 
             {/* Input */}
-            {viewMode === 'conversations' && selectedRecipient && (
+            {viewMode === 'conversations' && (selectedRecipient || selectedConv === 'team-chat') && (
               <div className="p-4 border-t border-gray-800 bg-[#12121a]">
                 <div className="flex gap-3">
                   <input
@@ -410,14 +474,14 @@ export default function ChatPanel({ agents, isOpen, onClose, initialChatId, curr
                     value={newMessage}
                     onChange={e => setNewMessage(e.target.value)}
                     onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendMessage()}
-                    placeholder={`Message ${getAgentName(selectedRecipient)}...`}
+                    placeholder={selectedConv === 'team-chat' ? 'Message all agents...' : `Message ${getAgentName(selectedRecipient || '')}...`}
                     className="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-indigo-500"
                     disabled={sending}
                   />
                   <button
                     onClick={sendMessage}
                     disabled={sending || !newMessage.trim()}
-                    className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:bg-gray-700 disabled:cursor-not-allowed text-white rounded-xl flex items-center gap-2 transition-colors"
+                    className={`px-4 py-2.5 ${selectedConv === 'team-chat' ? 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500' : 'bg-indigo-600 hover:bg-indigo-500'} disabled:bg-gray-700 disabled:cursor-not-allowed text-white rounded-xl flex items-center gap-2 transition-colors`}
                   >
                     <Send className="w-4 h-4" />
                     {sending ? 'Sending...' : 'Send'}
