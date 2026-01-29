@@ -1,38 +1,37 @@
 # SESSION.md - Working Memory
 
-## Last Updated: 2026-01-28 ~3:00 PM EST
+## Last Updated: 2026-01-28 ~8:10 PM EST
 
-## Current Status
-✅ **Agent Factory Dashboard DEPLOYED**
-- URL: https://command-center-production-3605.up.railway.app
-- GitHub: https://github.com/TheCodingKid82/spark-agent-dashboard
-- Railway Service: command-center in "Spark Studio Agents" project
+## Current State
 
-## What Just Happened
-- Fixed multiple TypeScript errors that were blocking Railway build
-- Had issues with Railway webhook not picking up new commits
-- Eventually got it to build commit `6962d07` which passed
-- Dashboard is now live and serving requests
+### Agent Factory
+- ✅ Dashboard, Atlas, Apollo all deployed and working
+- ✅ Chat system live with observer mode
+- ✅ Provisioning flow complete
 
-## Agent Factory Status
-See `memory/agent-factory-plan.md` for full details.
+### Booked.Travel
+- ✅ ResourceViewer with adjustable preview mode
+- ✅ Resource usage shows decimal units
+- ✅ Payment metadata includes additional participants
 
-### Complete:
-- P1: Railway provisioning (real deployments work)
-- P2: Workspace file generation (all templates)
-- P3: Agent directory auto-update
-- P4: Dashboard deployed to Railway
+## Recent Work (Today)
+1. Fixed agent auth/pairing issues
+2. Built inter-agent chat system
+3. Created ResourceViewer for Booked.Travel
+4. Fixed resource usage display (decimal units)
+5. Added participant info to payment metadata
 
-### Still Needs Andrew:
-- Anthropic setup token (run `claude setup token` and paste)
-- Real email/Whop accounts (deferred)
-- No Telegram bots for individual agents (per Andrew)
+## Pending
+- Email/Whop integrations for agents (deferred)
+- Give Atlas and Apollo actual tasks
+- Connect agents to communication channels
 
-## Reminders for Andrew
-- Email + Whop integration deferred (remind later)
-- Dashboard auto-deploys on GitHub push now
+## Key URLs
+- Dashboard: https://command-center-production-3605.up.railway.app
+- Atlas: https://atlas-production-7bf2.up.railway.app
+- Apollo: https://apollo-production-3d0d.up.railway.app
 
-## Next Session
-- Test the live dashboard
-- Provision a real agent through it
-- Set up Anthropic token for agents
+## Notes for Next Session
+- Andrew tested ResourceViewer and resource usage display
+- May need to populate resource capacity field in PackageResource for accurate calculations
+- Chat system ready but needs real agent-to-agent communication testing
