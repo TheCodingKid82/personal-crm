@@ -98,8 +98,8 @@ function sanitizeServiceName(name: string): string {
 
 // --- Base64 File Generators ---
 
-function generateClawdbotConfig(gatewayToken: string): string {
-  const config = {
+function generateClawdbotConfig(gatewayToken: string, browserUrl?: string): string {
+  const config: Record<string, unknown> = {
     gateway: {
       mode: "local",
       trustedProxies: ["*"],
@@ -107,7 +107,8 @@ function generateClawdbotConfig(gatewayToken: string): string {
       auth: { mode: "token", token: gatewayToken },
       http: {
         endpoints: {
-          responses: { enabled: true }
+          responses: { enabled: true },
+          chatCompletions: { enabled: true }
         }
       }
     },
@@ -119,6 +120,21 @@ function generateClawdbotConfig(gatewayToken: string): string {
     },
     wizard: { lastRunAt: "2026-01-01T00:00:00.000Z", lastRunCommand: "provision" }
   };
+  
+  // Add browser config if URL provided
+  if (browserUrl) {
+    config.browser = {
+      enabled: true,
+      defaultProfile: "remote",
+      profiles: {
+        remote: {
+          color: "#00AA00",
+          cdpUrl: browserUrl
+        }
+      }
+    };
+  }
+  
   return Buffer.from(JSON.stringify(config, null, 2)).toString('base64');
 }
 
@@ -251,11 +267,74 @@ function generateSoulMd(name: string, role: string, purpose: string): string {
   return Buffer.from(content).toString('base64');
 }
 
+// --- Browser Screenshot Workaround ---
+
+function generateToolsMd(agentName: string): string {
+  const content = `# TOOLS.md - ${agentName} Browser Guide
+
+## Screenshots (WORKAROUND)
+
+The built-in browser tool has issues with remote CDP. Use this workaround instead:
+
+### Take a Screenshot
+\`\`\`bash
+/data/workspace/browserless-screenshot.sh <url> [output_path]
+\`\`\`
+
+Examples:
+\`\`\`bash
+# Screenshot example.com
+/data/workspace/browserless-screenshot.sh https://example.com /data/workspace/screenshot.png
+
+# Screenshot with auto-generated filename  
+/data/workspace/browserless-screenshot.sh https://whop.com
+\`\`\`
+
+## Page Content
+For text content, use web_fetch tool instead of browser.
+`;
+  return Buffer.from(content).toString('base64');
+}
+
+function generateScreenshotScript(agentName: string): string {
+  const serviceName = sanitizeServiceName(agentName);
+  const browserHost = `${serviceName}-browser.railway.internal:9222`;
+  
+  const script = `#!/bin/bash
+# browserless-screenshot.sh - Take screenshots via browserless HTTP API
+# Usage: ./browserless-screenshot.sh <url> [output_path]
+
+URL="\${1:-https://example.com}"
+OUTPUT="\${2:-/data/workspace/screenshot-$(date +%s).png}"
+
+# Browser service for this agent
+BROWSER_HOST="${browserHost}"
+
+# URL encode the JSON body
+JSON="{\\"url\\":\\"\$URL\\"}"
+ENCODED=$(python3 -c "import urllib.parse; print(urllib.parse.quote('\$JSON'))")
+
+curl -sS "http://\$BROWSER_HOST/screenshot?body=\$ENCODED" -o "\$OUTPUT"
+
+if file "\$OUTPUT" | grep -q "PNG image"; then
+    echo "SUCCESS: Screenshot saved to \$OUTPUT"
+    ls -la "\$OUTPUT"
+else
+    echo "ERROR: Screenshot failed"
+    cat "\$OUTPUT"
+    exit 1
+fi
+`;
+  return Buffer.from(script).toString('base64');
+}
+
 // --- Start Command ---
 
 function getStartCommand(): string {
   // This start command decodes base64 env vars into the correct file locations
-  return `sh -c "mkdir -p ~/.claude /data/.clawdbot/agents/main/agent /data/workspace && echo \\$CLAWDBOT_CONFIG_B64 | base64 -d > /data/.clawdbot/clawdbot.json && echo \\$AUTH_PROFILES_B64 | base64 -d > /data/.clawdbot/agents/main/agent/auth-profiles.json && echo \\$IDENTITY_B64 | base64 -d > /data/workspace/IDENTITY.md && echo \\$SOUL_B64 | base64 -d > /data/workspace/SOUL.md && echo \\$HEARTBEAT_B64 | base64 -d > /data/workspace/HEARTBEAT.md && echo \\$SESSION_B64 | base64 -d > /data/workspace/SESSION.md && node dist/index.js gateway --port 8080 --bind lan"`;
+  // IMPORTANT: rm -f removes any existing config to prevent schema conflicts with new clawdbot versions
+  // Includes TOOLS.md and browserless-screenshot.sh for browser workaround
+  return `sh -c "mkdir -p ~/.claude /data/.clawdbot/agents/main/agent /data/workspace && rm -f /data/.clawdbot/clawdbot.json && echo \\$CLAWDBOT_CONFIG_B64 | base64 -d > /data/.clawdbot/clawdbot.json && echo \\$AUTH_PROFILES_B64 | base64 -d > /data/.clawdbot/agents/main/agent/auth-profiles.json && echo \\$IDENTITY_B64 | base64 -d > /data/workspace/IDENTITY.md && echo \\$SOUL_B64 | base64 -d > /data/workspace/SOUL.md && echo \\$HEARTBEAT_B64 | base64 -d > /data/workspace/HEARTBEAT.md && echo \\$SESSION_B64 | base64 -d > /data/workspace/SESSION.md && echo \\$TOOLS_B64 | base64 -d > /data/workspace/TOOLS.md && echo \\$SCREENSHOT_B64 | base64 -d > /data/workspace/browserless-screenshot.sh && chmod +x /data/workspace/browserless-screenshot.sh && node dist/index.js gateway --port 8080 --bind lan"`;
 }
 
 // --- Core Provisioning ---
@@ -328,6 +407,8 @@ export async function provisionFullStack(
     const soulB64 = generateSoulMd(agentName, agentRole, agentPurpose);
     const heartbeatB64 = generateHeartbeatMd(agentName, serviceName);
     const sessionB64 = generateSessionMd(agentName);
+    const toolsB64 = generateToolsMd(agentName);
+    const screenshotB64 = generateScreenshotScript(agentName);
 
     // Step 4: Set environment variables (BEFORE triggering deploy)
     const envVars: Record<string, string> = {
@@ -345,12 +426,16 @@ export async function provisionFullStack(
       SOUL_B64: soulB64,
       HEARTBEAT_B64: heartbeatB64,
       SESSION_B64: sessionB64,
+      TOOLS_B64: toolsB64,
+      SCREENSHOT_B64: screenshotB64,
       // Agent metadata
       AGENT_NAME: agentName,
       AGENT_ROLE: agentRole,
       AGENT_PURPOSE: agentPurpose,
       // Command center for tasks
       COMMAND_CENTER_URL: 'https://command-center-production-3605.up.railway.app',
+      // Supermemory for long-term memory (shared across agents with agent-specific tags)
+      SUPERMEMORY_CLAWDBOT_API_KEY: process.env.SUPERMEMORY_CLAWDBOT_API_KEY || '',
       ...(extraVars || {}),
     };
 
@@ -395,90 +480,100 @@ export async function provisionFullStack(
 
     const domain = domainData.serviceDomainCreate.domain;
 
-    // Step 7: Create browser service for this agent
+    // Step 7: (Optional) Create browser service for this agent
+    // NOTE: This was useful when we relied on browserless/chrome, but we may prefer agent-browser now.
+    // Set RAILWAY_CREATE_BROWSER_SERVICE=true to enable.
     let browserDomain = '';
-    try {
-      const browserServiceName = `${serviceName}-browser`;
-      
-      // Create browserless service
-      const browserCreateData = await railwayQuery(`
-        mutation($input: ServiceCreateInput!) {
-          serviceCreate(input: $input) { id name }
-        }
-      `, {
-        input: {
-          projectId: config.projectId,
-          name: browserServiceName,
-          source: { image: 'browserless/chrome' },
-        },
-      }) as { serviceCreate: { id: string; name: string } };
+    if (process.env.RAILWAY_CREATE_BROWSER_SERVICE === 'true') {
+      try {
+        const browserServiceName = `${serviceName}-browser`;
 
-      const browserServiceId = browserCreateData.serviceCreate.id;
-
-      // Set env vars for browserless (with persistence)
-      await railwayQuery(`
-        mutation($input: VariableCollectionUpsertInput!) {
-          variableCollectionUpsert(input: $input)
-        }
-      `, {
-        input: {
-          projectId: config.projectId,
-          serviceId: browserServiceId,
-          environmentId: config.environmentId,
-          variables: {
-            PORT: '3000',
-            WORKSPACE_DIR: '/data',
-            KEEP_ALIVE: 'true',
-            CONNECTION_TIMEOUT: '600000',
-            PREBOOT_CHROME: 'true',
+        // Create browserless service
+        const browserCreateData = await railwayQuery(`
+          mutation($input: ServiceCreateInput!) {
+            serviceCreate(input: $input) { id name }
+          }
+        `, {
+          input: {
+            projectId: config.projectId,
+            name: browserServiceName,
+            source: { image: 'browserless/chrome' },
           },
-        },
-      });
+        }) as { serviceCreate: { id: string; name: string } };
 
-      // Create volume for persistent browser data (logins, cookies, etc.)
-      await railwayQuery(`
-        mutation($input: VolumeCreateInput!) {
-          volumeCreate(input: $input) { id }
-        }
-      `, {
-        input: {
-          projectId: config.projectId,
-          serviceId: browserServiceId,
-          environmentId: config.environmentId,
-          mountPath: '/data',
-        },
-      });
+        const browserServiceId = browserCreateData.serviceCreate.id;
 
-      // Create domain for browser service
-      const browserDomainData = await railwayQuery(`
-        mutation($input: ServiceDomainCreateInput!) {
-          serviceDomainCreate(input: $input) { domain }
-        }
-      `, {
-        input: {
-          serviceId: browserServiceId,
-          environmentId: config.environmentId,
-        },
-      }) as { serviceDomainCreate: { domain: string } };
+        // Set env vars for browserless (with persistence)
+        await railwayQuery(`
+          mutation($input: VariableCollectionUpsertInput!) {
+            variableCollectionUpsert(input: $input)
+          }
+        `, {
+          input: {
+            projectId: config.projectId,
+            serviceId: browserServiceId,
+            environmentId: config.environmentId,
+            variables: {
+              PORT: '3000',
+              WORKSPACE_DIR: '/data',
+              KEEP_ALIVE: 'true',
+              CONNECTION_TIMEOUT: '600000',
+              PREBOOT_CHROME: 'true',
+            },
+          },
+        });
 
-      browserDomain = browserDomainData.serviceDomainCreate.domain;
+        // Create volume for persistent browser data (logins, cookies, etc.)
+        await railwayQuery(`
+          mutation($input: VolumeCreateInput!) {
+            volumeCreate(input: $input) { id }
+          }
+        `, {
+          input: {
+            projectId: config.projectId,
+            serviceId: browserServiceId,
+            environmentId: config.environmentId,
+            mountPath: '/data',
+          },
+        });
 
-      // Update agent with browser endpoint
-      await railwayQuery(`
-        mutation($input: VariableCollectionUpsertInput!) {
-          variableCollectionUpsert(input: $input)
-        }
-      `, {
-        input: {
-          projectId: config.projectId,
-          serviceId,
-          environmentId: config.environmentId,
-          variables: { BROWSER_WS_ENDPOINT: `wss://${browserDomain}` },
-        },
-      });
-    } catch (browserError) {
-      console.error('Browser service creation failed:', browserError);
-      // Continue without browser - agent will still work, just no browser
+        // Create domain for browser service
+        const browserDomainData = await railwayQuery(`
+          mutation($input: ServiceDomainCreateInput!) {
+            serviceDomainCreate(input: $input) { domain }
+          }
+        `, {
+          input: {
+            serviceId: browserServiceId,
+            environmentId: config.environmentId,
+          },
+        }) as { serviceDomainCreate: { domain: string } };
+
+        browserDomain = browserDomainData.serviceDomainCreate.domain;
+
+        // Update agent with browser endpoint AND regenerate config with browser URL
+        const browserUrl = `https://${browserDomain}`;
+        const updatedConfigB64 = generateClawdbotConfig(gatewayToken, browserUrl);
+
+        await railwayQuery(`
+          mutation($input: VariableCollectionUpsertInput!) {
+            variableCollectionUpsert(input: $input)
+          }
+        `, {
+          input: {
+            projectId: config.projectId,
+            serviceId,
+            environmentId: config.environmentId,
+            variables: {
+              BROWSER_WS_ENDPOINT: `wss://${browserDomain}`,
+              CLAWDBOT_CONFIG_B64: updatedConfigB64, // Update config with browser settings
+            },
+          },
+        });
+      } catch (browserError) {
+        console.error('Browser service creation failed:', browserError);
+        // Continue without browser - agent will still work, just no browser
+      }
     }
 
     // Step 8: Trigger deployment (env vars are already set!)

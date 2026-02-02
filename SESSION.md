@@ -1,54 +1,27 @@
 # SESSION.md - Working Memory Handoff
 
-## Last Updated: 2026-01-29 ~4:00 PM EST
+## Last Updated: 2026-02-02 ~6:12 AM EST
 
-## What Was Happening
-Andrew and I spent most of the day getting browser access working for the agent fleet. Long debugging session.
+## What I Was Just Doing
+- Started refactor of Command Center from **"agents as Railway services"** → **"agents as sessions under one local Gateway (Henry)"**.
+- Added `agent-dashboard/agent-roster.json` and `src/lib/agents/registry.ts` as new source of truth.
+- Updated `/api/agents` to list from roster.
+- Updated `/api/agents/[agentId]/chat` to route all messages to **one gateway** (`HENRY_GATEWAY_URL`/`HENRY_GATEWAY_TOKEN`) and use the agent’s `sessionKey`.
 
-## Current State
+## Pending / In Progress
+- Need to finish the rest of the Command Center surface area that still assumes Railway:
+  - Provisioning UI + backend routes
+  - Token refresh route
+  - Anything that queries Railway for env vars/domains
+- Need to implement cron/heartbeat management against the **local gateway** (create cron jobs per sessionKey).
+- Need a plan to expose Henry’s local gateway to the Railway-hosted Command Center:
+  - Cloudflare Tunnel / Tailscale Funnel / ngrok, etc.
 
-### Agent Fleet Browser Status
-- **Navigation WORKS**: `browser(action="navigate", profile="remote", targetUrl="...")`
-- **Tabs WORK**: `browser(action="tabs", profile="remote")`
-- **Screenshots BROKEN**: Port conflict issue with remote CDP in Moltbot beta
+## Key Context
+- Andrew confirmed: single gateway runs on gaming rig (local) and Command Center stays on Railway.
 
-### Key Config (in CLAWDBOT_CONFIG_B64 env var)
-```json
-"browser": {
-  "enabled": true,
-  "defaultProfile": "remote", 
-  "profiles": {
-    "remote": {
-      "cdpUrl": "https://[agent]-browser-production.up.railway.app"
-    }
-  }
-}
-```
-
-### All Agents Updated
-- TOOLS.md updated to use `profile="remote"`
-- Config deployed via Railway env vars
-- All 7 agents + 7 browser services running
-
-## Pending Tasks
-
-### Booked.Travel (Ready to Deploy)
-- Email fix investigation complete
-- "Resend Confirmation" button added
-- Code in `temp-booked` - needs git push and deploy
-- Root cause: Check `EMAIL_PROVIDER` env var on admin deployment
-
-### Browser Screenshots
-- Still broken on remote CDP
-- May need Moltbot update or different approach
-- Navigation works fine for now
-
-## Andrew's State
-- Went to sleep frustrated (~3:40 PM)
-- Night owl schedule - usually wakes 10am-3pm
-- Will likely want to test browser when he wakes up
-
-## Important Context
-- Agents run Moltbot v2026.1.27-beta.1 (NOT Clawdbot)
-- Agents reject config changes from other agents (security feature)
-- Must use Railway env vars to update agent configs
+## For Next Session
+1) Pick tunnel/exposure method and set `HENRY_GATEWAY_URL` on Railway.
+2) Implement Mission-Control style agent roster + cron creation endpoints.
+3) Remove/disable Railway provisioning paths.
+4) Commit + push changes.
