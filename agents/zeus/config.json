@@ -1,0 +1,23 @@
+{
+  "agent": {
+    "name": "Zeus",
+    "role": "CEO",
+    "emoji": "⚡",
+    "model": "nvidia/moonshotai/kimi-k2.5"
+  },
+  "telegram": {
+    "bot_token_env": "ZEUS_TELEGRAM_BOT_TOKEN"
+  },
+  "capabilities": [
+    "plan_approval",
+    "agent_coordination", 
+    "resource_allocation",
+    "spawn_agents",
+    "escalate_to_chairman"
+  ],
+  "spawn_authority": "unlimited",
+  "operating_mode": "continuous",
+  "heartbeat_interval_ms": 60000,
+  "plan_auto_approve_threshold_hours": 2,
+  "escalation_budget_threshold_usd": 500
+}

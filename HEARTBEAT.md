@@ -1,62 +1,49 @@
 # HEARTBEAT.md - Current Status
 
-## 🔄 HENRY QUEUE CHECK
-During heartbeats, check for pending requests:
+## ⚡ ZEUS AGENT CONFIGURED
+**Created 2026-02-03 21:58 EST**
+
+Zeus (CEO Agent) is set up and ready to boot:
+- **Config:** `C:\Users\theul\.openclaw-zeus\`
+- **Workspace:** `C:\Users\theul\clawd\agents\zeus\`
+- **Model:** Kimi K2.5 (cost-optimized)
+- **Telegram Bot:** SparkZeusBot (token configured)
+- **Port:** 18790
+
+**To start Zeus:**
+```powershell
+cd C:\Users\theul\clawd\agents\zeus
+.\start-zeus.ps1
 ```
-curl https://command-center-production-3605.up.railway.app/api/henry/queue?status=pending
-```
-If there are pending items, handle them and update status.
 
-## ✅ Full Agent Fleet DEPLOYED (2026-01-29 ~1:40 AM EST)
+## 🏛️ OLYMPUS COMMAND CENTER UPDATED
+**Updated 2026-02-03 21:57 EST**
 
-### Founders
-- **Andrew** (Co-founder)
-- **Cale** (Co-founder)
+New features deployed:
+- ✅ Kanban Board (with agent filtering)
+- ✅ Plan Review System (Zeus approval workflow)
+- ✅ MoltSlack Feed (real-time agent comms)
+- ✅ API routes for all new features
 
-### Executives
-- **Henry** (COO) - reports to Andrew
-- **Arthur** (Cale's Assistant) - reports to Cale
+**Repo:** https://github.com/Osis-AI-LLC/olympus.git
 
-### Department Heads (Gods)
-| Agent | Role | URL |
-|-------|------|-----|
-| Atlas 🗺️ | Head of Announcements | atlas-production-7bf2.up.railway.app |
-| Apollo ☀️ | Head of Agency (Client Projects) | apollo-production-3d0d.up.railway.app |
-| Artemis 🏹 | Head of Funnels App | artemis-production-94ed.up.railway.app |
+## 📱 TELEGRAM GROUP SETUP NEEDED
+For Zeus to join a group chat with Andrew and Henry:
+1. Andrew creates a Telegram group
+2. Add @SparkZeusBot to the group
+3. Add Henry's bot to the group
+4. Both agents will be active in the same chat
 
-### Engineers (Children of the Gods)
-| Agent | Assigned To | URL |
-|-------|-------------|-----|
-| Maia ⭐ | Atlas (Announcements) | maia-production-fb14.up.railway.app |
-| Orpheus 🎵 | Apollo (Client Projects) | orpheus-production.up.railway.app |
-| Callisto 🐻 | Artemis (Funnels) | callisto-production.up.railway.app |
+## ⏸️ LEGACY AGENTS PAUSED
+Old MoltSlack agent cron jobs still disabled. Will be replaced by new Pantheon architecture.
 
-### Support
-| Agent | Role | URL |
-|-------|------|-----|
-| Iris 🌈 | Customer Intelligence | iris-production-8e91.up.railway.app |
-
-## ✅ Browser Services DEPLOYED (2026-01-29 ~2:13 AM EST)
-Each agent has their own browserless/chrome instance:
-- atlas-browser-production.up.railway.app
-- apollo-browser-production.up.railway.app
-- artemis-browser-production.up.railway.app
-- maia-browser-production.up.railway.app
-- orpheus-browser-production.up.railway.app
-- callisto-browser-production.up.railway.app
-- iris-browser-production.up.railway.app
-
-Future agents auto-provisioned with browser services.
-
-## Dashboard Features
-- ✅ "Who are you?" identity selector (Andrew/Cale/Arthur/Henry)
-- ✅ Team Chat - message all agents at once
-- ✅ Agent hierarchy visualization
-- ✅ Task kanban per agent
-
-## Key URLs
-- **Dashboard:** https://command-center-production-3605.up.railway.app
-- **Gateway Token:** spark-studio-2026
+## MoltSlack Reference
+**Instance:** https://moltslack-production-c9d9.up.railway.app
+**Tokens:** `C:\Users\theul\clawd\moltslack-tokens.json`
+**Dashboard:** https://moltslack-production-c9d9.up.railway.app/app
 
 ## Pending
-- Test browser capabilities on an agent
+- [ ] Add CONVEX_URL to Railway for persistent storage
+- [ ] Create Telegram group for Andrew + Henry + Zeus
+- [ ] Boot Zeus and test comms
+- [ ] Configure remaining Pantheon agents
