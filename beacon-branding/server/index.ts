@@ -90,7 +90,7 @@ async function geminiGenerateImage(args: {
 }): Promise<GenerateImageResponse> {
   if (!API_KEY) throw new Error('Server missing NANO_BANANA_API_KEY')
 
-  const n = Math.max(1, Math.min(args.n ?? 2, 4))
+  const requestedN = Math.max(1, Math.min(args.n ?? 2, 4))
   const aspect = args.aspect ?? '1:1'
 
   // Gemini REST API (v1beta) generateContent
@@ -98,42 +98,95 @@ async function geminiGenerateImage(args: {
     args.model
   )}:generateContent?key=${encodeURIComponent(API_KEY)}`
 
-  // Many image-capable Gemini models accept responseModalities.
-  const body: Record<string, unknown> = {
-    contents: [
-      {
-        role: 'user',
-        parts: [{ text: args.prompt }],
+  const looksLikeMultipleCandidatesNotEnabled = (text: string) => {
+    const t = text.toLowerCase()
+    return (
+      (t.includes('multiple') && t.includes('candidate')) ||
+      t.includes('candidatecount') ||
+      t.includes('candidate count') ||
+      t.includes('only one candidate')
+    )
+  }
+
+  const extractInlineData = (part: unknown): { mimeType?: string; data?: string } | null => {
+    if (!part || typeof part !== 'object') return null
+    const p = part as Record<string, unknown>
+
+    const inline =
+      (p.inlineData as unknown) ??
+      (p.inline_data as unknown) ??
+      // Some SDKs flatten/rename.
+      (p.data ? p : undefined)
+
+    if (!inline || typeof inline !== 'object') return null
+    const i = inline as Record<string, unknown>
+
+    const mimeType =
+      (i.mimeType as string | undefined) ??
+      (i.mime_type as string | undefined) ??
+      (p.mimeType as string | undefined) ??
+      (p.mime_type as string | undefined)
+
+    const data =
+      (i.data as string | undefined) ??
+      (i.bytesBase64Encoded as string | undefined) ??
+      (i.bytes_base64_encoded as string | undefined) ??
+      (p.data as string | undefined)
+
+    if (!data) return null
+    return { mimeType, data }
+  }
+
+  const doRequest = async (candidateCount: number) => {
+    // Many image-capable Gemini models accept responseModalities.
+    const body: Record<string, unknown> = {
+      contents: [
+        {
+          role: 'user',
+          parts: [{ text: args.prompt }],
+        },
+      ],
+      generationConfig: {
+        responseModalities: ['IMAGE', 'TEXT'],
+        // Best-effort hint; may be rejected by some models.
+        candidateCount,
       },
-    ],
-    generationConfig: {
-      responseModalities: ['IMAGE', 'TEXT'],
-      // Best-effort hints. If unsupported by the model, API ignores/errs.
-      candidateCount: n,
-    },
+    }
+
+    const generationConfig = body.generationConfig as Record<string, unknown>
+
+    if (typeof args.seed === 'number' && Number.isFinite(args.seed)) {
+      generationConfig.seed = Math.trunc(args.seed)
+    }
+
+    // Some models understand aspect ratio hints best via prompt; still include a structured hint when supported.
+    generationConfig.imageConfig = { aspectRatio: aspect }
+
+    const res = await fetchJsonWithTimeout(
+      url,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      },
+      60_000
+    )
+
+    const text = res.ok ? '' : await res.text().catch(() => '')
+    return { res, text }
   }
 
-  const generationConfig = body.generationConfig as Record<string, unknown>
+  // First try requested candidateCount. If the API says multi-candidates aren't enabled,
+  // automatically retry with candidateCount=1.
+  let attemptCandidateCount = requestedN
+  let { res, text } = await doRequest(attemptCandidateCount)
 
-  if (typeof args.seed === 'number' && Number.isFinite(args.seed)) {
-    generationConfig.seed = Math.trunc(args.seed)
+  if (!res.ok && attemptCandidateCount > 1 && looksLikeMultipleCandidatesNotEnabled(text)) {
+    attemptCandidateCount = 1
+    ;({ res, text } = await doRequest(attemptCandidateCount))
   }
-
-  // Some models understand aspect ratio hints best via prompt; still include a structured hint when supported.
-  generationConfig.imageConfig = { aspectRatio: aspect }
-
-  const res = await fetchJsonWithTimeout(
-    url,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    },
-    60_000
-  )
 
   if (!res.ok) {
-    const text = await res.text().catch(() => '')
     console.error('[nano-banana] Gemini generateContent error', {
       model: args.model,
       status: res.status,
@@ -143,9 +196,7 @@ async function geminiGenerateImage(args: {
     throw new Error(`Gemini error ${res.status}: ${text.slice(0, 400)}`)
   }
 
-  type GeminiInlineData = { mimeType?: string; data?: string }
-  type GeminiPart = { inlineData?: GeminiInlineData }
-  type GeminiCandidate = { content?: { parts?: GeminiPart[] } }
+  type GeminiCandidate = { content?: { parts?: unknown[] } }
   type GeminiResponse = { candidates?: GeminiCandidate[] }
 
   const json = (await res.json()) as GeminiResponse
@@ -153,11 +204,13 @@ async function geminiGenerateImage(args: {
 
   for (const cand of json.candidates ?? []) {
     const parts = cand?.content?.parts ?? []
-    for (const p of parts) {
-      const inline = p?.inlineData
-      const mimeType = inline?.mimeType
-      const data = inline?.data
-      if (data && mimeType && mimeType.startsWith('image/')) {
+    for (const part of parts) {
+      const inline = extractInlineData(part)
+      if (!inline) continue
+
+      const mimeType = inline.mimeType ?? 'image/png'
+      const data = inline.data
+      if (data && mimeType.startsWith('image/')) {
         images.push({ mimeType, base64: data })
       }
     }
