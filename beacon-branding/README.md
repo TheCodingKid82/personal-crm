@@ -1,0 +1,33 @@
+# Beacon Branding — Local Icon / Logo Explorer
+
+Local-only tool to generate and review many **SVG icon variants** for the working name **Beacon**.
+
+## What it does
+- Generates data-driven variants across:
+  - Concepts: beacon waves, lighthouse, lantern+page, B-with-beam, radar sweep, compass star, book+beam
+  - Colorways
+  - Stroke weights (thin/regular/bold)
+  - Style (mono vs duo accent)
+- Renders everything in a big grid with filters.
+- Exports:
+  - **SVG** download
+  - **PNG 512 / 1024** (optionally transparent or matching preview background)
+  - Copy SVG to clipboard
+
+## Run
+From `C:\Users\theul\clawd\beacon-branding`:
+
+```bash
+pnpm install
+pnpm dev
+```
+
+Vite will print the local URL (typically `http://localhost:5173`).
+
+## Where to edit
+- Concepts / geometry: `src/branding/svg.ts`
+- Variant matrix (concepts × weights × styles × colorways): `src/branding/variants.ts`
+- Color palettes: `src/branding/colorways.ts`
+
+## Notes
+These SVGs are designed on a 24×24 viewBox with consistent caps/joins for legibility.
