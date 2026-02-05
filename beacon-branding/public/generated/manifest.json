@@ -1,0 +1,38 @@
+{
+  "generatedAt": "2026-02-05T12:18:42.884Z",
+  "concepts": [
+    {
+      "id": "b-beam",
+      "items": []
+    },
+    {
+      "id": "beacon-waves",
+      "items": [
+        {
+          "src": "/generated/beacon-waves/beacon-waves__01.png",
+          "filename": "beacon-waves__01.png"
+        }
+      ]
+    },
+    {
+      "id": "book-beam",
+      "items": []
+    },
+    {
+      "id": "compass-star",
+      "items": []
+    },
+    {
+      "id": "lantern-page",
+      "items": []
+    },
+    {
+      "id": "lighthouse-min",
+      "items": []
+    },
+    {
+      "id": "radar-sweep",
+      "items": []
+    }
+  ]
+}
