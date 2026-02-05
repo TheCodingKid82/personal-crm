@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../design-system.css">
+  <style>
+    .testimonial-wrap {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 80px;
+      background: var(--ss-bg-primary);
+      overflow: hidden;
+    }
+
+    .quote-mark {
+      font-family: var(--ss-font-display);
+      font-size: 120px;
+      font-weight: 700;
+      line-height: 1;
+      background: var(--ss-accent-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 16px;
+      z-index: 2;
+    }
+
+    .quote-text {
+      font-family: var(--ss-font-body);
+      font-weight: 500;
+      font-size: clamp(22px, 3vw, 34px);
+      line-height: 1.5;
+      color: var(--ss-text-primary);
+      max-width: 80%;
+      margin-bottom: 48px;
+      z-index: 2;
+      font-style: italic;
+    }
+
+    .author-section {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      z-index: 2;
+      margin-bottom: 12px;
+    }
+
+    .author-avatar {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: var(--ss-accent-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      font-weight: 700;
+      color: white;
+      flex-shrink: 0;
+      border: 2px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .author-info {
+      text-align: left;
+    }
+
+    .author-name {
+      font-family: var(--ss-font-display);
+      font-weight: 700;
+      font-size: 20px;
+      color: var(--ss-text-primary);
+      margin-bottom: 4px;
+    }
+
+    .author-role {
+      font-family: var(--ss-font-body);
+      font-weight: 400;
+      font-size: 15px;
+      color: var(--ss-text-secondary);
+    }
+
+    .stars {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 28px;
+      z-index: 2;
+      font-size: 24px;
+    }
+
+    .bottom-brand {
+      position: absolute;
+      bottom: 40px;
+      z-index: 2;
+    }
+
+    /* Decorative */
+    .orb-1 { width: 500px; height: 500px; top: -25%; left: -20%; }
+    .orb-2 { width: 400px; height: 400px; bottom: -20%; right: -15%; }
+
+    /* Accent line */
+    .accent-line {
+      width: 60px;
+      height: 3px;
+      background: var(--ss-accent-gradient);
+      border-radius: 99px;
+      margin-bottom: 40px;
+      z-index: 2;
+    }
+
+    /* Size overrides */
+    .size-ig-story .quote-text { font-size: 36px; max-width: 85%; }
+    .size-ig-story .quote-mark { font-size: 140px; }
+    .size-ig-story .testimonial-wrap { padding: 120px 60px; }
+
+    .size-twitter .testimonial-wrap,
+    .size-fb-ad .testimonial-wrap { padding: 40px 60px; }
+    .size-twitter .quote-mark,
+    .size-fb-ad .quote-mark { font-size: 80px; margin-bottom: 8px; }
+    .size-twitter .quote-text,
+    .size-fb-ad .quote-text { font-size: 24px; margin-bottom: 28px; max-width: 85%; }
+    .size-twitter .stars,
+    .size-fb-ad .stars { margin-bottom: 16px; }
+    .size-twitter .accent-line,
+    .size-fb-ad .accent-line { margin-bottom: 24px; }
+  </style>
+</head>
+<body>
+  <div class="ad-container size-ig-feed">
+    <div class="testimonial-wrap">
+      <!-- Background -->
+      <div class="noise-overlay"></div>
+      <div class="glow-orb glow-blue orb-1"></div>
+      <div class="glow-orb glow-purple orb-2"></div>
+
+      <!-- Quote mark -->
+      <div class="quote-mark">"</div>
+
+      <!-- Quote -->
+      <p class="quote-text">{{QUOTE_TEXT}}</p>
+
+      <!-- Stars -->
+      <div class="stars">⭐⭐⭐⭐⭐</div>
+
+      <!-- Accent line -->
+      <div class="accent-line"></div>
+
+      <!-- Author -->
+      <div class="author-section">
+        <div class="author-avatar">{{AUTHOR_INITIAL}}</div>
+        <div class="author-info">
+          <div class="author-name">{{AUTHOR_NAME}}</div>
+          <div class="author-role">{{AUTHOR_ROLE}}</div>
+        </div>
+      </div>
+
+      <!-- Bottom brand -->
+      <div class="bottom-brand">
+        <span class="spark-logo"><span class="spark-dot"></span>{{PRODUCT_NAME}}</span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

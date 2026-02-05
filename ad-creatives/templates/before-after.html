@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../design-system.css">
+  <style>
+    .ba-wrap {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      background: var(--ss-bg-primary);
+      overflow: hidden;
+    }
+
+    .ba-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 64px 48px 32px;
+      z-index: 2;
+    }
+
+    .ba-headline {
+      font-family: var(--ss-font-display);
+      font-weight: 700;
+      font-size: 48px;
+      line-height: 1.15;
+      color: var(--ss-text-primary);
+      margin-bottom: 8px;
+    }
+
+    .ba-subline {
+      font-family: var(--ss-font-body);
+      font-size: 18px;
+      color: var(--ss-text-secondary);
+    }
+
+    .ba-split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      flex: 1;
+      gap: 24px;
+      z-index: 2;
+      padding: 16px 48px;
+      align-items: stretch;
+    }
+
+    .ba-side {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 36px 32px;
+      border-radius: 20px;
+      position: relative;
+    }
+
+    .ba-before {
+      background: rgba(239, 68, 68, 0.06);
+      border: 1px solid rgba(239, 68, 68, 0.15);
+    }
+
+    .ba-after {
+      background: rgba(34, 197, 94, 0.06);
+      border: 1px solid rgba(34, 197, 94, 0.15);
+    }
+
+    .ba-side-label {
+      font-family: var(--ss-font-body);
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 28px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .ba-before .ba-side-label { color: var(--ss-danger); }
+    .ba-after .ba-side-label { color: var(--ss-success); }
+
+    .ba-side-label .label-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .ba-before .label-dot { background: var(--ss-danger); }
+    .ba-after .label-dot { background: var(--ss-success); }
+
+    .ba-point {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .ba-point:last-child { margin-bottom: 0; }
+
+    .ba-point-icon {
+      font-size: 22px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .ba-point-text {
+      font-family: var(--ss-font-body);
+      font-weight: 500;
+      font-size: 18px;
+      line-height: 1.45;
+      color: var(--ss-text-primary);
+    }
+
+    .ba-footer {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 24px 48px 32px;
+      z-index: 2;
+    }
+
+    .bottom-brand {
+      display: flex;
+      justify-content: center;
+      padding-bottom: 40px;
+      z-index: 2;
+    }
+
+    /* Decorative */
+    .orb-1 { width: 400px; height: 400px; top: -15%; left: -15%; }
+    .orb-2 { width: 350px; height: 350px; bottom: -15%; right: -15%; }
+
+    /* Size overrides */
+    .size-ig-story .ba-split { grid-template-columns: 1fr; }
+    .size-ig-story .ba-headline { font-size: 56px; }
+    .size-ig-story .ba-point-text { font-size: 24px; }
+    .size-ig-story .ba-header { padding: 100px 60px 40px; }
+    .size-ig-story .ba-split { padding: 16px 60px; }
+
+    .size-twitter .ba-header,
+    .size-fb-ad .ba-header { padding: 36px 48px 16px; }
+    .size-twitter .ba-headline,
+    .size-fb-ad .ba-headline { font-size: 36px; }
+    .size-twitter .ba-split,
+    .size-fb-ad .ba-split { padding: 8px 36px; gap: 16px; }
+    .size-twitter .ba-side,
+    .size-fb-ad .ba-side { padding: 24px 20px; }
+    .size-twitter .ba-point-text,
+    .size-fb-ad .ba-point-text { font-size: 15px; }
+    .size-twitter .ba-footer,
+    .size-fb-ad .ba-footer { padding: 16px 36px 12px; }
+    .size-twitter .ba-point,
+    .size-fb-ad .ba-point { margin-bottom: 12px; }
+    .size-twitter .ba-side-label,
+    .size-fb-ad .ba-side-label { margin-bottom: 16px; }
+    .size-twitter .bottom-brand,
+    .size-fb-ad .bottom-brand { padding-bottom: 24px; }
+  </style>
+</head>
+<body>
+  <div class="ad-container size-ig-feed">
+    <div class="ba-wrap">
+      <!-- Background -->
+      <div class="noise-overlay"></div>
+      <div class="glow-orb glow-blue orb-1" style="opacity: 0.25;"></div>
+      <div class="glow-orb glow-purple orb-2" style="opacity: 0.25;"></div>
+
+      <!-- Header -->
+      <div class="ba-header">
+        <h2 class="ba-headline">{{HEADLINE}}</h2>
+        <p class="ba-subline">{{SUBLINE}}</p>
+      </div>
+
+      <!-- Split -->
+      <div class="ba-split">
+        <!-- Before -->
+        <div class="ba-side ba-before">
+          <div class="ba-side-label"><span class="label-dot"></span>{{BEFORE_LABEL}}</div>
+          <div class="ba-point">
+            <span class="ba-point-icon">❌</span>
+            <span class="ba-point-text">{{BEFORE_POINT_1}}</span>
+          </div>
+          <div class="ba-point">
+            <span class="ba-point-icon">❌</span>
+            <span class="ba-point-text">{{BEFORE_POINT_2}}</span>
+          </div>
+          <div class="ba-point">
+            <span class="ba-point-icon">❌</span>
+            <span class="ba-point-text">{{BEFORE_POINT_3}}</span>
+          </div>
+        </div>
+
+        <!-- After -->
+        <div class="ba-side ba-after">
+          <div class="ba-side-label"><span class="label-dot"></span>{{AFTER_LABEL}}</div>
+          <div class="ba-point">
+            <span class="ba-point-icon">✅</span>
+            <span class="ba-point-text">{{AFTER_POINT_1}}</span>
+          </div>
+          <div class="ba-point">
+            <span class="ba-point-icon">✅</span>
+            <span class="ba-point-text">{{AFTER_POINT_2}}</span>
+          </div>
+          <div class="ba-point">
+            <span class="ba-point-icon">✅</span>
+            <span class="ba-point-text">{{AFTER_POINT_3}}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer CTA -->
+      <div class="ba-footer">
+        <a class="btn btn-primary" href="#">{{CTA_TEXT}}</a>
+      </div>
+
+      <!-- Brand -->
+      <div class="bottom-brand">
+        <span class="spark-logo"><span class="spark-dot"></span>{{PRODUCT_NAME}}</span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,88 @@
+{
+  "creatives": [
+    {
+      "template": "hero-launch",
+      "size": "ig-feed",
+      "vars": {
+        "BADGE_TEXT": "🏆 #1 on Whop",
+        "HEADLINE": "#1 App on Whop",
+        "SUBLINE": "Send announcements your audience actually reads. Push notifications, email, SMS — all in one.",
+        "CTA_TEXT": "Start Free →",
+        "PRODUCT_NAME": "Announcements App"
+      }
+    },
+    {
+      "template": "hero-launch",
+      "size": "twitter",
+      "vars": {
+        "BADGE_TEXT": "Now Live",
+        "HEADLINE": "Your Audience is Waiting",
+        "SUBLINE": "Stop shouting into the void. Reach your community with push, email, and SMS — every time.",
+        "CTA_TEXT": "Try It Free →",
+        "PRODUCT_NAME": "Announcements App"
+      }
+    },
+    {
+      "template": "before-after",
+      "size": "ig-feed",
+      "vars": {
+        "HEADLINE": "Stop Losing Subscribers",
+        "SUBLINE": "The difference one tool makes",
+        "BEFORE_LABEL": "Without Announcements",
+        "BEFORE_POINT_1": "Posts buried in Discord noise",
+        "BEFORE_POINT_2": "30% open rate on emails",
+        "BEFORE_POINT_3": "Members miss important updates",
+        "AFTER_LABEL": "With Announcements",
+        "AFTER_POINT_1": "Push notifications — 90%+ open rate",
+        "AFTER_POINT_2": "Multi-channel: push + email + SMS",
+        "AFTER_POINT_3": "Every member sees every update",
+        "CTA_TEXT": "Switch Now →",
+        "PRODUCT_NAME": "Announcements App"
+      }
+    },
+    {
+      "template": "social-proof",
+      "size": "ig-feed",
+      "vars": {
+        "TAGLINE": "Trusted by creators on Whop",
+        "STAT_1_NUMBER": "10K+",
+        "STAT_1_LABEL": "Announcements Sent",
+        "STAT_2_NUMBER": "90%",
+        "STAT_2_LABEL": "Open Rate",
+        "STAT_3_NUMBER": "500+",
+        "STAT_3_LABEL": "Active Communities",
+        "HEADLINE": "The announcement tool built for creators",
+        "CTA_TEXT": "Join Them →",
+        "PRODUCT_NAME": "Announcements App"
+      }
+    },
+    {
+      "template": "feature-highlight",
+      "size": "twitter",
+      "vars": {
+        "FEATURE_ICON": "🔔",
+        "FEATURE_LABEL": "Core Feature",
+        "FEATURE_NAME": "Push Notifications That Actually Land",
+        "FEATURE_DESC": "Skip the inbox. Skip the algorithm. Send a push notification and land directly on your members' lock screen.",
+        "CTA_TEXT": "See It In Action →",
+        "PRODUCT_NAME": "Announcements App"
+      }
+    },
+    {
+      "template": "urgency-cta",
+      "size": "ig-feed",
+      "vars": {
+        "URGENCY_BADGE": "Limited Time",
+        "HEADLINE": "Launch Pricing Ends Soon",
+        "OFFER_TEXT": "50% Off — First 3 Months",
+        "DETAIL_TEXT": "Lock in founder pricing before it's gone. Cancel anytime.",
+        "HOURS": "23",
+        "MINUTES": "47",
+        "SECONDS": "12",
+        "CTA_TEXT": "Claim Your Spot →",
+        "FINE_PRINT": "Offer valid for new accounts only",
+        "PRODUCT_NAME": "Announcements App"
+      }
+    }
+  ]
+}

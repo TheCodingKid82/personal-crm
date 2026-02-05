@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../design-system.css">
+  <style>
+    .proof-wrap {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 80px;
+      background: var(--ss-bg-primary);
+      overflow: hidden;
+    }
+
+    .proof-tagline {
+      font-family: var(--ss-font-body);
+      font-weight: 600;
+      font-size: 16px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--ss-accent-blue);
+      margin-bottom: 48px;
+      z-index: 2;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 48px;
+      width: 100%;
+      max-width: 900px;
+      margin-bottom: 56px;
+      z-index: 2;
+    }
+
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .stat-number {
+      font-family: var(--ss-font-display);
+      font-weight: 700;
+      font-size: clamp(48px, 7vw, 72px);
+      line-height: 1;
+      background: var(--ss-accent-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .stat-label {
+      font-family: var(--ss-font-body);
+      font-weight: 500;
+      font-size: clamp(14px, 1.8vw, 18px);
+      color: var(--ss-text-secondary);
+      letter-spacing: 0.05em;
+    }
+
+    .stat-divider {
+      width: 1px;
+      height: 80px;
+      background: rgba(255, 255, 255, 0.08);
+      align-self: center;
+    }
+
+    .proof-headline {
+      font-family: var(--ss-font-display);
+      font-weight: 700;
+      font-size: clamp(28px, 4vw, 44px);
+      line-height: 1.2;
+      color: var(--ss-text-primary);
+      margin-bottom: 32px;
+      max-width: 80%;
+      z-index: 2;
+    }
+
+    .proof-cta {
+      z-index: 2;
+    }
+
+    .bottom-brand {
+      position: absolute;
+      bottom: 40px;
+      z-index: 2;
+    }
+
+    /* Decorative */
+    .orb-1 { width: 450px; height: 450px; top: -20%; right: -15%; }
+    .orb-2 { width: 350px; height: 350px; bottom: -15%; left: -10%; }
+
+    /* Size overrides */
+    .size-ig-story .stats-grid {
+      grid-template-columns: 1fr;
+      gap: 56px;
+      max-width: 600px;
+    }
+    .size-ig-story .stat-number { font-size: 80px; }
+    .size-ig-story .stat-label { font-size: 22px; }
+    .size-ig-story .proof-headline { font-size: 48px; }
+
+    .size-twitter .proof-wrap,
+    .size-fb-ad .proof-wrap { padding: 50px 60px; }
+    .size-twitter .stat-number,
+    .size-fb-ad .stat-number { font-size: 48px; }
+    .size-twitter .stats-grid,
+    .size-fb-ad .stats-grid { gap: 32px; margin-bottom: 36px; }
+    .size-twitter .proof-headline,
+    .size-fb-ad .proof-headline { font-size: 32px; margin-bottom: 24px; }
+    .size-twitter .proof-tagline,
+    .size-fb-ad .proof-tagline { margin-bottom: 32px; }
+  </style>
+</head>
+<body>
+  <div class="ad-container size-ig-feed">
+    <div class="proof-wrap">
+      <!-- Background -->
+      <div class="grid-bg"></div>
+      <div class="noise-overlay"></div>
+      <div class="glow-orb glow-purple orb-1"></div>
+      <div class="glow-orb glow-blue orb-2"></div>
+
+      <!-- Tagline -->
+      <div class="proof-tagline">{{TAGLINE}}</div>
+
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-number">{{STAT_1_NUMBER}}</div>
+          <div class="stat-label">{{STAT_1_LABEL}}</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">{{STAT_2_NUMBER}}</div>
+          <div class="stat-label">{{STAT_2_LABEL}}</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">{{STAT_3_NUMBER}}</div>
+          <div class="stat-label">{{STAT_3_LABEL}}</div>
+        </div>
+      </div>
+
+      <!-- Headline -->
+      <h2 class="proof-headline">{{HEADLINE}}</h2>
+
+      <!-- CTA -->
+      <div class="proof-cta">
+        <a class="btn btn-primary" href="#">{{CTA_TEXT}}</a>
+      </div>
+
+      <!-- Bottom brand -->
+      <div class="bottom-brand">
+        <span class="spark-logo"><span class="spark-dot"></span>{{PRODUCT_NAME}}</span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

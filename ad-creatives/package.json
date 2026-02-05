@@ -1,0 +1,13 @@
+{
+  "name": "@spark/ad-creatives",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "render": "node render.js",
+    "generate:batch": "node generate-batch.js",
+    "generate:legacy": "node generate.js"
+  },
+  "dependencies": {
+    "puppeteer-core": "^24.36.1"
+  }
+}

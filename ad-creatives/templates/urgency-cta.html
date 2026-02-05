@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../design-system.css">
+  <style>
+    .urgency-wrap {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 80px;
+      background: var(--ss-bg-primary);
+      overflow: hidden;
+    }
+
+    .urgency-badge {
+      margin-bottom: 36px;
+      z-index: 2;
+    }
+
+    .urgency-badge .badge {
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    .urgency-headline {
+      font-family: var(--ss-font-display);
+      font-weight: 700;
+      font-size: clamp(44px, 6vw, 72px);
+      line-height: 1.05;
+      color: var(--ss-text-primary);
+      margin-bottom: 20px;
+      max-width: 90%;
+      z-index: 2;
+    }
+
+    .urgency-offer {
+      font-family: var(--ss-font-display);
+      font-weight: 700;
+      font-size: clamp(28px, 4vw, 48px);
+      line-height: 1.2;
+      margin-bottom: 28px;
+      z-index: 2;
+      background: var(--ss-accent-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .urgency-detail {
+      font-family: var(--ss-font-body);
+      font-weight: 400;
+      font-size: clamp(16px, 2vw, 22px);
+      line-height: 1.5;
+      color: var(--ss-text-secondary);
+      max-width: 70%;
+      margin-bottom: 20px;
+      z-index: 2;
+    }
+
+    /* Countdown */
+    .countdown {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 48px;
+      z-index: 2;
+    }
+
+    .countdown-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .countdown-number {
+      font-family: var(--ss-font-display);
+      font-weight: 700;
+      font-size: clamp(36px, 5vw, 56px);
+      color: var(--ss-text-primary);
+      background: var(--ss-bg-card);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 16px;
+      width: 90px;
+      height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .countdown-label {
+      font-family: var(--ss-font-body);
+      font-weight: 500;
+      font-size: 12px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--ss-text-muted);
+    }
+
+    .countdown-sep {
+      font-family: var(--ss-font-display);
+      font-weight: 700;
+      font-size: 40px;
+      color: var(--ss-text-muted);
+      align-self: flex-start;
+      margin-top: 20px;
+    }
+
+    .urgency-cta {
+      z-index: 2;
+      margin-bottom: 20px;
+    }
+
+    .urgency-fine-print {
+      font-family: var(--ss-font-body);
+      font-size: 13px;
+      color: var(--ss-text-muted);
+      z-index: 2;
+    }
+
+    .bottom-brand {
+      position: absolute;
+      bottom: 40px;
+      z-index: 2;
+    }
+
+    /* Glow border effect */
+    .urgency-wrap::before {
+      content: '';
+      position: absolute;
+      inset: 12px;
+      border-radius: 20px;
+      border: 1px solid rgba(79, 110, 255, 0.12);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Decorative */
+    .orb-1 { width: 600px; height: 600px; top: -25%; left: -20%; opacity: 0.4; }
+    .orb-2 { width: 500px; height: 500px; bottom: -20%; right: -15%; opacity: 0.4; }
+
+    /* Size overrides */
+    .size-ig-story .urgency-headline { font-size: 68px; }
+    .size-ig-story .urgency-offer { font-size: 44px; }
+    .size-ig-story .countdown-number { width: 100px; height: 110px; font-size: 52px; }
+    .size-ig-story .urgency-wrap { padding: 120px 60px; }
+
+    .size-twitter .urgency-wrap,
+    .size-fb-ad .urgency-wrap { padding: 40px 60px; }
+    .size-twitter .urgency-headline,
+    .size-fb-ad .urgency-headline { font-size: 44px; margin-bottom: 12px; }
+    .size-twitter .urgency-offer,
+    .size-fb-ad .urgency-offer { font-size: 32px; margin-bottom: 16px; }
+    .size-twitter .countdown,
+    .size-fb-ad .countdown { margin-bottom: 28px; gap: 10px; }
+    .size-twitter .countdown-number,
+    .size-fb-ad .countdown-number { width: 70px; height: 78px; font-size: 36px; border-radius: 12px; }
+    .size-twitter .urgency-badge,
+    .size-fb-ad .urgency-badge { margin-bottom: 20px; }
+    .size-twitter .urgency-detail,
+    .size-fb-ad .urgency-detail { font-size: 16px; margin-bottom: 12px; }
+  </style>
+</head>
+<body>
+  <div class="ad-container size-ig-feed">
+    <div class="urgency-wrap">
+      <!-- Background -->
+      <div class="noise-overlay"></div>
+      <div class="glow-orb glow-purple orb-1"></div>
+      <div class="glow-orb glow-blue orb-2"></div>
+
+      <!-- Badge -->
+      <div class="urgency-badge">
+        <span class="badge badge-danger">🔥 {{URGENCY_BADGE}}</span>
+      </div>
+
+      <!-- Headline -->
+      <h1 class="urgency-headline">{{HEADLINE}}</h1>
+
+      <!-- Offer -->
+      <div class="urgency-offer">{{OFFER_TEXT}}</div>
+
+      <!-- Detail -->
+      <p class="urgency-detail">{{DETAIL_TEXT}}</p>
+
+      <!-- Countdown -->
+      <div class="countdown">
+        <div class="countdown-item">
+          <div class="countdown-number">{{HOURS}}</div>
+          <div class="countdown-label">Hours</div>
+        </div>
+        <span class="countdown-sep">:</span>
+        <div class="countdown-item">
+          <div class="countdown-number">{{MINUTES}}</div>
+          <div class="countdown-label">Minutes</div>
+        </div>
+        <span class="countdown-sep">:</span>
+        <div class="countdown-item">
+          <div class="countdown-number">{{SECONDS}}</div>
+          <div class="countdown-label">Seconds</div>
+        </div>
+      </div>
+
+      <!-- CTA -->
+      <div class="urgency-cta">
+        <a class="btn btn-primary btn-lg" href="#">{{CTA_TEXT}}</a>
+      </div>
+
+      <!-- Fine print -->
+      <p class="urgency-fine-print">{{FINE_PRINT}}</p>
+
+      <!-- Brand -->
+      <div class="bottom-brand">
+        <span class="spark-logo"><span class="spark-dot"></span>{{PRODUCT_NAME}}</span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../design-system.css">
+  <style>
+    .hero-wrap {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 80px;
+      background: var(--ss-bg-primary);
+      overflow: hidden;
+    }
+
+    .hero-badge {
+      margin-bottom: 36px;
+      z-index: 2;
+    }
+
+    .hero-headline {
+      font-family: var(--ss-font-display);
+      font-weight: 700;
+      font-size: clamp(48px, 6vw, 80px);
+      line-height: 1.05;
+      color: var(--ss-text-primary);
+      margin-bottom: 28px;
+      max-width: 90%;
+      z-index: 2;
+    }
+
+    .hero-subline {
+      font-family: var(--ss-font-body);
+      font-weight: 400;
+      font-size: clamp(18px, 2.5vw, 26px);
+      line-height: 1.5;
+      color: var(--ss-text-secondary);
+      max-width: 70%;
+      margin-bottom: 48px;
+      z-index: 2;
+    }
+
+    .hero-cta {
+      z-index: 2;
+      margin-bottom: 48px;
+    }
+
+    .hero-product-name {
+      font-family: var(--ss-font-display);
+      font-weight: 600;
+      font-size: clamp(14px, 1.5vw, 18px);
+      color: var(--ss-text-muted);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      z-index: 2;
+    }
+
+    /* Decorative orbs */
+    .orb-1 {
+      width: 500px; height: 500px;
+      top: -15%; left: -10%;
+    }
+    .orb-2 {
+      width: 400px; height: 400px;
+      bottom: -10%; right: -10%;
+    }
+    .orb-3 {
+      width: 300px; height: 300px;
+      top: 40%; right: 5%;
+      opacity: 0.3;
+    }
+
+    .bottom-bar {
+      position: absolute;
+      bottom: 40px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      z-index: 2;
+    }
+
+    /* Size overrides */
+    .size-ig-story .hero-headline { font-size: 72px; }
+    .size-ig-story .hero-subline { font-size: 28px; max-width: 85%; }
+    .size-ig-story .hero-wrap { padding: 100px 60px; }
+
+    .size-twitter .hero-wrap,
+    .size-fb-ad .hero-wrap { padding: 50px 80px; }
+    .size-twitter .hero-headline,
+    .size-fb-ad .hero-headline { font-size: 52px; }
+    .size-twitter .hero-subline,
+    .size-fb-ad .hero-subline { font-size: 20px; max-width: 80%; margin-bottom: 32px; }
+  </style>
+</head>
+<body>
+  <div class="ad-container size-ig-feed">
+    <div class="hero-wrap">
+      <!-- Background decorations -->
+      <div class="grid-bg"></div>
+      <div class="noise-overlay"></div>
+      <div class="glow-orb glow-blue orb-1"></div>
+      <div class="glow-orb glow-purple orb-2"></div>
+      <div class="glow-orb glow-blue orb-3"></div>
+
+      <!-- Badge -->
+      <div class="hero-badge">
+        <span class="badge badge-accent">{{BADGE_TEXT}}</span>
+      </div>
+
+      <!-- Headline -->
+      <h1 class="hero-headline">{{HEADLINE}}</h1>
+
+      <!-- Subline -->
+      <p class="hero-subline">{{SUBLINE}}</p>
+
+      <!-- CTA -->
+      <div class="hero-cta">
+        <a class="btn btn-primary btn-lg" href="#">{{CTA_TEXT}}</a>
+      </div>
+
+      <!-- Bottom branding -->
+      <div class="bottom-bar">
+        <span class="spark-logo"><span class="spark-dot"></span>{{PRODUCT_NAME}}</span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

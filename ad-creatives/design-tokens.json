@@ -1,0 +1,53 @@
+{
+  "meta": {
+    "name": "Spark Studio Ad Creatives",
+    "version": "1.0.0"
+  },
+  "cssVariables": {
+    "--ss-bg-primary": "#0A0A0F",
+    "--ss-bg-secondary": "#111118",
+    "--ss-bg-card": "#16161F",
+    "--ss-bg-elevated": "#1C1C28",
+
+    "--ss-accent-blue": "#4F6EFF",
+    "--ss-accent-purple": "#8B5CF6",
+    "--ss-accent-gradient": "linear-gradient(135deg, #4F6EFF 0%, #8B5CF6 50%, #C084FC 100%)",
+    "--ss-accent-glow": "0 0 40px rgba(79, 110, 255, 0.3), 0 0 80px rgba(139, 92, 246, 0.15)",
+
+    "--ss-text-primary": "#FFFFFF",
+    "--ss-text-secondary": "#A1A1B5",
+    "--ss-text-muted": "#6B6B80",
+
+    "--ss-success": "#22C55E",
+    "--ss-danger": "#EF4444",
+    "--ss-warning": "#F59E0B",
+
+    "--ss-font-body": "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+    "--ss-font-display": "'Space Grotesk', 'Inter', sans-serif",
+
+    "--ss-text-xs": "clamp(10px, 1.2vw, 12px)",
+    "--ss-text-sm": "clamp(12px, 1.5vw, 14px)",
+    "--ss-text-base": "clamp(14px, 1.8vw, 16px)",
+    "--ss-text-lg": "clamp(16px, 2.2vw, 20px)",
+    "--ss-text-xl": "clamp(20px, 3vw, 28px)",
+    "--ss-text-2xl": "clamp(28px, 4vw, 40px)",
+    "--ss-text-3xl": "clamp(36px, 5.5vw, 56px)",
+    "--ss-text-4xl": "clamp(44px, 7vw, 72px)",
+    "--ss-text-hero": "clamp(52px, 9vw, 96px)",
+
+    "--ss-space-xs": "4px",
+    "--ss-space-sm": "8px",
+    "--ss-space-md": "16px",
+    "--ss-space-lg": "24px",
+    "--ss-space-xl": "32px",
+    "--ss-space-2xl": "48px",
+    "--ss-space-3xl": "64px",
+
+    "--ss-radius-sm": "6px",
+    "--ss-radius-md": "12px",
+    "--ss-radius-lg": "20px",
+    "--ss-radius-full": "9999px",
+
+    "--ss-transition": "all 0.2s ease"
+  }
+}

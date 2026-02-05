@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../design-system.css">
+  <style>
+    .feature-wrap {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 80px;
+      background: var(--ss-bg-primary);
+      overflow: hidden;
+    }
+
+    .feature-icon-wrap {
+      width: 120px;
+      height: 120px;
+      border-radius: 28px;
+      background: linear-gradient(135deg, rgba(79, 110, 255, 0.15), rgba(139, 92, 246, 0.15));
+      border: 1px solid rgba(79, 110, 255, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 56px;
+      margin-bottom: 40px;
+      z-index: 2;
+      box-shadow: 0 0 60px rgba(79, 110, 255, 0.15);
+    }
+
+    .feature-label {
+      font-family: var(--ss-font-body);
+      font-weight: 600;
+      font-size: 14px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--ss-accent-blue);
+      margin-bottom: 20px;
+      z-index: 2;
+    }
+
+    .feature-name {
+      font-family: var(--ss-font-display);
+      font-weight: 700;
+      font-size: clamp(40px, 5vw, 60px);
+      line-height: 1.1;
+      color: var(--ss-text-primary);
+      margin-bottom: 24px;
+      max-width: 85%;
+      z-index: 2;
+    }
+
+    .feature-desc {
+      font-family: var(--ss-font-body);
+      font-weight: 400;
+      font-size: clamp(16px, 2vw, 22px);
+      line-height: 1.6;
+      color: var(--ss-text-secondary);
+      max-width: 65%;
+      margin-bottom: 48px;
+      z-index: 2;
+    }
+
+    .feature-cta {
+      z-index: 2;
+    }
+
+    .bottom-brand {
+      position: absolute;
+      bottom: 40px;
+      z-index: 2;
+    }
+
+    /* Decorative */
+    .orb-1 { width: 400px; height: 400px; top: -10%; left: 50%; transform: translateX(-50%); }
+    .orb-2 { width: 300px; height: 300px; bottom: -10%; right: -5%; }
+
+    /* Size overrides */
+    .size-ig-story .feature-icon-wrap { width: 140px; height: 140px; font-size: 64px; }
+    .size-ig-story .feature-name { font-size: 64px; }
+    .size-ig-story .feature-desc { font-size: 26px; max-width: 80%; }
+
+    .size-twitter .feature-wrap,
+    .size-fb-ad .feature-wrap { padding: 40px 60px; flex-direction: row; gap: 48px; text-align: left; }
+    .size-twitter .feature-icon-wrap,
+    .size-fb-ad .feature-icon-wrap { width: 90px; height: 90px; font-size: 44px; border-radius: 20px; margin-bottom: 0; flex-shrink: 0; }
+    .size-twitter .feature-content,
+    .size-fb-ad .feature-content { display: flex; flex-direction: column; align-items: flex-start; }
+    .size-twitter .feature-name,
+    .size-fb-ad .feature-name { font-size: 40px; }
+    .size-twitter .feature-desc,
+    .size-fb-ad .feature-desc { font-size: 18px; max-width: 100%; margin-bottom: 28px; }
+  </style>
+</head>
+<body>
+  <div class="ad-container size-ig-feed">
+    <div class="feature-wrap">
+      <!-- Background -->
+      <div class="grid-bg"></div>
+      <div class="noise-overlay"></div>
+      <div class="glow-orb glow-purple orb-1"></div>
+      <div class="glow-orb glow-blue orb-2"></div>
+
+      <!-- Icon -->
+      <div class="feature-icon-wrap">{{FEATURE_ICON}}</div>
+
+      <!-- Label -->
+      <div class="feature-label">{{FEATURE_LABEL}}</div>
+
+      <!-- Feature Name -->
+      <h2 class="feature-name">{{FEATURE_NAME}}</h2>
+
+      <!-- Description -->
+      <p class="feature-desc">{{FEATURE_DESC}}</p>
+
+      <!-- CTA -->
+      <div class="feature-cta">
+        <a class="btn btn-primary" href="#">{{CTA_TEXT}}</a>
+      </div>
+
+      <!-- Bottom brand -->
+      <div class="bottom-brand">
+        <span class="spark-logo"><span class="spark-dot"></span>{{PRODUCT_NAME}}</span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
