@@ -19,10 +19,34 @@ From `C:\Users\theul\clawd\beacon-branding`:
 
 ```bash
 pnpm install
-pnpm dev
+```
+
+### (Optional) Nano Banana image generation
+1) Create an env file:
+
+```bash
+copy .env.example .env
+```
+
+2) Put your Google Gemini key in `.env`:
+
+```bash
+NANO_BANANA_API_KEY=YOUR_KEY_HERE
+```
+
+3) Run web + local API server together:
+
+```bash
+pnpm dev:all
 ```
 
 Vite will print the local URL (typically `http://localhost:5173`).
+
+If you only want the SVG grid (no AI comps), you can still run just:
+
+```bash
+pnpm dev
+```
 
 ## Where to edit
 - Concepts / geometry: `src/branding/svg.ts`

@@ -6,6 +6,16 @@ import { buildVariants, COLORWAY_ORDER, CONCEPTS, STROKE_WEIGHTS, STYLES } from 
 import { renderConceptSvg } from './branding/svg'
 import { downloadBlob, downloadText, svgToPngBlob } from './branding/export'
 
+type GeneratedComp = {
+  id: string
+  conceptId: ConceptId
+  conceptName: string
+  prompt: string
+  model: string
+  createdAt: number
+  images: Array<{ mimeType: string; base64: string }>
+}
+
 type FilterAll<T extends string> = T | 'all'
 
 function App() {
@@ -18,6 +28,11 @@ function App() {
   const [style, setStyle] = useState<FilterAll<StrokeStyleId>>('duo')
   const [query, setQuery] = useState('')
   const [pngBg, setPngBg] = useState<'transparent' | 'match'>('match')
+
+  const [nanoModel, setNanoModel] = useState<'flash' | 'pro'>('flash')
+  const [genBusy, setGenBusy] = useState<ConceptId | null>(null)
+  const [genError, setGenError] = useState<string | null>(null)
+  const [generated, setGenerated] = useState<GeneratedComp[]>([])
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
@@ -37,6 +52,65 @@ function App() {
 
   const pageBg = bgMode === 'dark' ? '#0B0E14' : '#F6F7FB'
   const pageFg = bgMode === 'dark' ? '#EAEFFC' : '#0B1220'
+
+  function buildNanoBananaPrompt(c: { id: ConceptId; name: string }) {
+    // Template tuned for logo comps: simple, geometric, no text, app-icon friendly.
+    return [
+      `Design a modern minimal logo mark / app icon for a consumer product called "Beacon".`,
+      `Concept direction: ${c.name}.`,
+      `Style: flat vector, clean geometry, high contrast, centered composition, simple shapes, no gradients.`,
+      `Constraints: NO text, NO letters, NO words, NO watermarks, no mockups, no background scene.`,
+      `Deliverable: 1:1 square PNG with transparent background, crisp edges, icon-ready.`
+    ].join('\n')
+  }
+
+  function base64ToBlob(base64: string, mimeType: string) {
+    const bin = atob(base64)
+    const bytes = new Uint8Array(bin.length)
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i)
+    return new Blob([bytes], { type: mimeType })
+  }
+
+  async function generateForConcept(c: { id: ConceptId; name: string }) {
+    setGenError(null)
+    setGenBusy(c.id)
+
+    const prompt = buildNanoBananaPrompt(c)
+    const model = nanoModel === 'pro' ? 'gemini-3-pro-image-preview' : 'gemini-2.5-flash-image'
+
+    try {
+      const res = await fetch('/api/generate-image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt,
+          aspect: '1:1',
+          model,
+          n: 2,
+        }),
+      })
+
+      const json = await res.json()
+      if (!res.ok) throw new Error(json?.error ?? 'Generation failed')
+
+      const comp: GeneratedComp = {
+        id: `${c.id}__${Date.now()}__${Math.random().toString(16).slice(2)}`,
+        conceptId: c.id,
+        conceptName: c.name,
+        prompt,
+        model: json.model,
+        createdAt: Date.now(),
+        images: json.images,
+      }
+
+      setGenerated((prev) => [comp, ...prev])
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : 'Generation failed'
+      setGenError(msg)
+    } finally {
+      setGenBusy(null)
+    }
+  }
 
   return (
     <div className="page" style={{ background: pageBg, color: pageFg }}>
@@ -60,6 +134,13 @@ function App() {
             <select value={pngBg} onChange={(e) => setPngBg(e.target.value as 'transparent' | 'match')}>
               <option value="match">Match preview</option>
               <option value="transparent">Transparent</option>
+            </select>
+          </label>
+          <label className="seg">
+            <span>Nano Banana</span>
+            <select value={nanoModel} onChange={(e) => setNanoModel(e.target.value as 'flash' | 'pro')}>
+              <option value="flash">Flash (gemini-2.5-flash-image)</option>
+              <option value="pro">Pro (gemini-3-pro-image-preview)</option>
             </select>
           </label>
         </div>
@@ -132,6 +213,86 @@ function App() {
           Showing <b>{filtered.length}</b> / {variants.length} variants
         </div>
       </section>
+
+      <section className="filters">
+        <div style={{ display: 'flex', gap: 10, alignItems: 'flex-end', justifyContent: 'space-between' }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontWeight: 700, marginBottom: 6 }}>Generate AI comps (Nano Banana)</div>
+            <div style={{ opacity: 0.8, fontSize: 13 }}>
+              Generates fresh raster comps per concept (no text) and shows them below.
+            </div>
+          </div>
+
+          {genError ? (
+            <div style={{ color: '#ff8a8a', fontSize: 13, maxWidth: 520 }}>{genError}</div>
+          ) : null}
+        </div>
+
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 10 }}>
+          {CONCEPTS.map((c) => (
+            <button
+              key={c.id}
+              onClick={() => generateForConcept(c)}
+              disabled={!!genBusy}
+              title={buildNanoBananaPrompt(c)}
+              style={{
+                opacity: genBusy && genBusy !== c.id ? 0.5 : 1,
+              }}
+            >
+              {genBusy === c.id ? `Generating ${c.name}…` : `Generate: ${c.name}`}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      {generated.length ? (
+        <section className="grid" style={{ paddingTop: 0 }}>
+          {generated.flatMap((g) =>
+            g.images.map((img, idx) => {
+              const src = `data:${img.mimeType};base64,${img.base64}`
+              const filename = `beacon__nano-banana__${g.conceptId}__${g.model}__${new Date(
+                g.createdAt
+              )
+                .toISOString()
+                .replace(/[:.]/g, '-')}_${idx + 1}.png`
+
+              return (
+                <div key={`${g.id}__${idx}`} className="card" style={{ background: '#111827' }}>
+                  <img
+                    src={src}
+                    alt={`${g.conceptName} comp ${idx + 1}`}
+                    style={{ width: '100%', height: 220, objectFit: 'contain', padding: 14 }}
+                  />
+
+                  <div className="label">
+                    <div className="labelTop">{g.conceptName}</div>
+                    <div className="labelBottom">{g.model}</div>
+                  </div>
+
+                  <div className="actions">
+                    <button
+                      onClick={() => {
+                        const blob = base64ToBlob(img.base64, img.mimeType)
+                        downloadBlob(filename, blob)
+                      }}
+                    >
+                      Download PNG
+                    </button>
+
+                    <button
+                      onClick={async () => {
+                        await navigator.clipboard.writeText(g.prompt)
+                      }}
+                    >
+                      Copy prompt
+                    </button>
+                  </div>
+                </div>
+              )
+            })
+          )}
+        </section>
+      ) : null}
 
       <main className="grid">
         {filtered.map((v) => {
