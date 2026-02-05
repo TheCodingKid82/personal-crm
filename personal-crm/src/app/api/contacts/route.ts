@@ -54,6 +54,18 @@ export async function GET(request: NextRequest) {
   const rows = db.prepare(query).all(...params) as ContactRow[];
   const contacts = rows.map(parseContact);
 
+  // Optional allowlist filtering (used for the "sent emails" target list).
+  // IMPORTANT: this is opt-in via query param so we don't accidentally hide data.
+  const allowlist = url.searchParams.get('allowlist') || '';
+  if (allowlist === 'sent-email-targets') {
+    const { isAllowlistedName } = await import('@/lib/allowlist');
+    const { SENT_EMAIL_ALLOWLIST } = await import('@/lib/allowlist-data');
+
+    const filtered = contacts.filter(c => isAllowlistedName(`${c.firstName} ${c.lastName}`, SENT_EMAIL_ALLOWLIST));
+    return NextResponse.json({ contacts: filtered, total: filtered.length });
+  }
+
+
   const countQuery = query.replace(/SELECT \*/, 'SELECT COUNT(*) as count').replace(/ ORDER BY.*/, '');
   const countParams = params.slice(0, -2);
   const { count } = db.prepare(countQuery).get(...countParams) as { count: number };

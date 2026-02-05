@@ -1,0 +1,48 @@
+import { buildAllowlist } from './allowlist';
+
+// Source of truth: this is the list Andrew provided ("include only these people").
+// IMPORTANT: This list is used as a *seed* for enrichment; we do not hard-delete other contacts.
+// We use it to:
+// - highlight/track target people
+// - filter "sent-email" import candidates
+
+export const SENT_EMAIL_TARGET_NAMES = [
+  'Matt Billington',
+  'Danielle Strachman',
+  'Melora Laforetto',
+  'Jessica Oldakowski',
+  'Ari Dotla',
+  'Hakeem Shannon',
+  'Guy Kawasaki',
+  'Sion Zhang',
+  'Nicholas Donahue',
+  'Elaine (Elena) Finn',
+  'Molly Smith',
+  'Andrew Choi',
+  'Adrian Martinez',
+  'Zach Holman',
+  'Josh Schinzelber',
+  'Andrew Nisma',
+  'Bianca Monica',
+  'Bear Matthews',
+  'Corey Levy',
+  'Jeff Ralston',
+  'Dee Dee Das',
+  'Jenny Qi Ta',
+  'Adam Williams',
+  'Coffee Hair Rousen',
+  'Anod Sanwal',
+  'Advik Kapoor',
+  'Sophia West',
+  'Shriyans Ghosh',
+  'Natalie Eisen',
+  'Shamus Madon',
+  'Adrian Ashley',
+  'Jason Choi',
+  'Suhas',
+  'Deborah Castillo',
+  'Thomas Suarez',
+  'Jay Woods',
+] as const;
+
+export const SENT_EMAIL_ALLOWLIST = buildAllowlist([...SENT_EMAIL_TARGET_NAMES]);
