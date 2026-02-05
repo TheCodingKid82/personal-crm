@@ -16,6 +16,23 @@ type GeneratedComp = {
   images: Array<{ mimeType: string; base64: string }>
 }
 
+type GeneratedBatchIndex = {
+  batchId: string
+  createdAt: number
+  apiUrl?: string
+  requestedN: number
+  keepFirstN: number
+  model: string
+  concepts: Array<{
+    conceptId: ConceptId
+    conceptName: string
+    prompt: string
+    model: string
+    files: string[]
+    error?: string
+  }>
+}
+
 type GeneratedManifest = {
   generatedAt: string
   concepts: Array<{
@@ -37,10 +54,18 @@ function App() {
   const [query, setQuery] = useState('')
   const [pngBg, setPngBg] = useState<'transparent' | 'match'>('match')
 
-  const [nanoModel, setNanoModel] = useState<'flash' | 'pro'>('flash')
+  type NanoModelId =
+    | 'gemini-2.5-flash-image'
+    | 'gemini-3-pro-image-preview'
+    | 'imagen-4-ultra-preview-0606'
+
+  const [nanoModel, setNanoModel] = useState<NanoModelId>('gemini-2.5-flash-image')
   const [genBusy, setGenBusy] = useState<ConceptId | null>(null)
   const [genError, setGenError] = useState<string | null>(null)
   const [generated, setGenerated] = useState<GeneratedComp[]>([])
+
+  const [batchIndex, setBatchIndex] = useState<GeneratedBatchIndex | null>(null)
+  const [batchError, setBatchError] = useState<string | null>(null)
 
   const [savedManifest, setSavedManifest] = useState<GeneratedManifest | null>(null)
   const [savedError, setSavedError] = useState<string | null>(null)
@@ -92,6 +117,32 @@ function App() {
   const pageBg = bgMode === 'dark' ? '#0B0E14' : '#F6F7FB'
   const pageFg = bgMode === 'dark' ? '#EAEFFC' : '#0B1220'
 
+  useEffect(() => {
+    let cancelled = false
+
+    async function loadBatch() {
+      try {
+        setBatchError(null)
+        const res = await fetch('/generated/index.json', { cache: 'no-store' })
+        if (!res.ok) {
+          // If the file doesn't exist yet, just leave it blank.
+          if (res.status === 404) return
+          throw new Error(`Failed to load generated batch (${res.status})`)
+        }
+        const json = (await res.json()) as GeneratedBatchIndex
+        if (!cancelled) setBatchIndex(json)
+      } catch (e: unknown) {
+        const msg = e instanceof Error ? e.message : 'Failed to load generated batch'
+        if (!cancelled) setBatchError(msg)
+      }
+    }
+
+    loadBatch()
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
   function buildNanoBananaPrompt(c: { id: ConceptId; name: string }) {
     // Template tuned for logo comps: simple, geometric, no text, app-icon friendly.
     return [
@@ -115,7 +166,7 @@ function App() {
     setGenBusy(c.id)
 
     const prompt = buildNanoBananaPrompt(c)
-    const model = nanoModel === 'pro' ? 'gemini-3-pro-image-preview' : 'gemini-2.5-flash-image'
+    const model = nanoModel
 
     try {
       const res = await fetch('/api/generate-image', {
@@ -151,6 +202,17 @@ function App() {
     }
   }
 
+  async function generateAllConcepts() {
+    setGenError(null)
+
+    for (const c of CONCEPTS) {
+      // eslint-disable-next-line no-await-in-loop
+      await generateForConcept(c)
+      // eslint-disable-next-line no-await-in-loop
+      await new Promise((r) => setTimeout(r, 200))
+    }
+  }
+
   return (
     <div className="page" style={{ background: pageBg, color: pageFg }}>
       <header className="header">
@@ -177,9 +239,10 @@ function App() {
           </label>
           <label className="seg">
             <span>Nano Banana</span>
-            <select value={nanoModel} onChange={(e) => setNanoModel(e.target.value as 'flash' | 'pro')}>
-              <option value="flash">Flash (gemini-2.5-flash-image)</option>
-              <option value="pro">Pro (gemini-3-pro-image-preview)</option>
+            <select value={nanoModel} onChange={(e) => setNanoModel(e.target.value as NanoModelId)}>
+              <option value="gemini-2.5-flash-image">Flash (gemini-2.5-flash-image)</option>
+              <option value="gemini-3-pro-image-preview">Pro (gemini-3-pro-image-preview)</option>
+              <option value="imagen-4-ultra-preview-0606">Imagen 4 Ultra (imagen-4-ultra-preview-0606)</option>
             </select>
           </label>
         </div>
@@ -268,6 +331,13 @@ function App() {
         </div>
 
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 10 }}>
+          <button
+            onClick={() => generateAllConcepts()}
+            disabled={!!genBusy}
+            title="Generate 2 comps per concept"
+          >
+            {genBusy ? 'Generating…' : 'Generate ALL concepts (2 each)'}
+          </button>
           {CONCEPTS.map((c) => (
             <button
               key={c.id}
@@ -283,6 +353,104 @@ function App() {
           ))}
         </div>
       </section>
+
+      {batchError ? (
+        <section className="filters" style={{ paddingTop: 0 }}>
+          <div style={{ color: '#ff8a8a', fontSize: 13 }}>{batchError}</div>
+        </section>
+      ) : null}
+
+      {batchIndex ? (
+        <section className="grid" style={{ paddingTop: 0 }}>
+          <div
+            style={{ gridColumn: '1 / -1', display: 'flex', justifyContent: 'space-between', gap: 12 }}
+          >
+            <div>
+              <div style={{ fontWeight: 700 }}>Generated batch</div>
+              <div style={{ opacity: 0.75, fontSize: 13 }}>
+                {new Date(batchIndex.createdAt).toLocaleString()} • {batchIndex.model}
+              </div>
+            </div>
+            <button
+              onClick={async () => {
+                // simple refresh
+                const res = await fetch('/generated/index.json', { cache: 'no-store' })
+                if (res.ok) setBatchIndex((await res.json()) as GeneratedBatchIndex)
+              }}
+            >
+              Refresh
+            </button>
+          </div>
+
+          {batchIndex.concepts.flatMap((c) => {
+            if (!c.files.length) {
+              return [
+                <div
+                  key={`${batchIndex.batchId}__${c.conceptId}__error`}
+                  className="card"
+                  style={{ background: '#111827', padding: 14 }}
+                >
+                  <div style={{ fontWeight: 700, marginBottom: 6 }}>{c.conceptName}</div>
+                  <div style={{ opacity: 0.75, fontSize: 13, marginBottom: 10 }}>{c.model}</div>
+                  <div style={{ color: '#ff8a8a', fontSize: 13 }}>{c.error ?? 'No files generated'}</div>
+                  <div className="actions" style={{ marginTop: 10 }}>
+                    <button
+                      onClick={async () => {
+                        await navigator.clipboard.writeText(c.prompt)
+                      }}
+                    >
+                      Copy prompt
+                    </button>
+                  </div>
+                </div>,
+              ]
+            }
+
+            return c.files.map((file, idx) => (
+              <div
+                key={`${batchIndex.batchId}__${c.conceptId}__${idx}`}
+                className="card"
+                style={{ background: '#111827' }}
+              >
+                <img
+                  src={file}
+                  alt={`${c.conceptName} batch comp ${idx + 1}`}
+                  style={{ width: '100%', height: 220, objectFit: 'contain', padding: 14 }}
+                />
+
+                <div className="label">
+                  <div className="labelTop">{c.conceptName}</div>
+                  <div className="labelBottom">{c.model}</div>
+                </div>
+
+                <div className="actions">
+                  <button
+                    onClick={() => {
+                      // Download direct from public path
+                      const a = document.createElement('a')
+                      a.href = file
+                      a.download = file.split('/').pop() ?? 'beacon.png'
+                      document.body.appendChild(a)
+                      a.click()
+                      a.remove()
+                    }}
+                  >
+                    Download PNG
+                  </button>
+
+                  <button
+                    onClick={async () => {
+                      await navigator.clipboard.writeText(c.prompt)
+                    }}
+                  >
+                    Copy prompt
+                  </button>
+                </div>
+              </div>
+            ))
+          })}
+        </section>
+      ) : null}
 
       {generated.length ? (
         <section className="grid" style={{ paddingTop: 0 }}>

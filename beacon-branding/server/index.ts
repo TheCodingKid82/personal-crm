@@ -56,6 +56,31 @@ function enqueue<T>(fn: () => Promise<T>): Promise<T> {
   return next
 }
 
+function isImagenModel(model: string) {
+  return model.toLowerCase().startsWith('imagen-')
+}
+
+function safeEndpointForLog(url: string) {
+  try {
+    const u = new URL(url)
+    if (u.searchParams.has('key')) u.searchParams.set('key', 'REDACTED')
+    return u.toString()
+  } catch {
+    return url
+  }
+}
+
+async function fetchJsonWithTimeout(url: string, init: RequestInit, timeoutMs: number) {
+  const ctrl = new AbortController()
+  const t = setTimeout(() => ctrl.abort(), timeoutMs)
+  try {
+    const res = await fetch(url, { ...init, signal: ctrl.signal })
+    return res
+  } finally {
+    clearTimeout(t)
+  }
+}
+
 async function geminiGenerateImage(args: {
   prompt: string
   model: string
@@ -97,18 +122,24 @@ async function geminiGenerateImage(args: {
   // Some models understand aspect ratio hints best via prompt; still include a structured hint when supported.
   generationConfig.imageConfig = { aspectRatio: aspect }
 
-  const ctrl = new AbortController()
-  const t = setTimeout(() => ctrl.abort(), 60_000)
-
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-    signal: ctrl.signal,
-  }).finally(() => clearTimeout(t))
+  const res = await fetchJsonWithTimeout(
+    url,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    },
+    60_000
+  )
 
   if (!res.ok) {
     const text = await res.text().catch(() => '')
+    console.error('[nano-banana] Gemini generateContent error', {
+      model: args.model,
+      status: res.status,
+      endpoint: safeEndpointForLog(url),
+      body: text.slice(0, 800),
+    })
     throw new Error(`Gemini error ${res.status}: ${text.slice(0, 400)}`)
   }
 
@@ -133,8 +164,83 @@ async function geminiGenerateImage(args: {
   }
 
   if (!images.length) {
-    // Include a small snippet for debugging but avoid dumping massive payloads.
     throw new Error('No image data returned by Gemini for this prompt.')
+  }
+
+  return { model: args.model, images }
+}
+
+async function imagenPredict(args: {
+  prompt: string
+  model: string
+  aspect?: string
+  n?: number
+}): Promise<GenerateImageResponse> {
+  if (!API_KEY) throw new Error('Server missing NANO_BANANA_API_KEY')
+
+  const sampleCount = Math.max(1, Math.min(args.n ?? 2, 4))
+  const aspectRatio = args.aspect ?? '1:1'
+
+  // Imagen REST API (v1beta) predict
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(
+    args.model
+  )}:predict?key=${encodeURIComponent(API_KEY)}`
+
+  // Per Andrew:
+  // { instances:[{prompt}], parameters:{ sampleCount, aspectRatio } }
+  const body = {
+    instances: [{ prompt: args.prompt }],
+    parameters: {
+      sampleCount,
+      aspectRatio,
+    },
+  }
+
+  const res = await fetchJsonWithTimeout(
+    url,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    },
+    90_000
+  )
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => '')
+    console.error('[nano-banana] Imagen predict error', {
+      model: args.model,
+      status: res.status,
+      endpoint: safeEndpointForLog(url),
+      body: text.slice(0, 800),
+    })
+    throw new Error(`Imagen error ${res.status}: ${text.slice(0, 400)}`)
+  }
+
+  type ImagenPrediction = {
+    mimeType?: string
+    bytesBase64Encoded?: string
+    image?: { mimeType?: string; bytesBase64Encoded?: string }
+  }
+  type ImagenResponse = { predictions?: ImagenPrediction[] }
+
+  const json = (await res.json()) as ImagenResponse
+
+  const images: GenerateImageResponse['images'] = []
+  for (const pred of json.predictions ?? []) {
+    const base64 = pred?.bytesBase64Encoded ?? pred?.image?.bytesBase64Encoded
+    if (!base64) continue
+
+    const mimeType = pred?.mimeType ?? pred?.image?.mimeType ?? 'image/png'
+    images.push({ mimeType, base64 })
+  }
+
+  if (!images.length) {
+    console.error('[nano-banana] Imagen predict returned no images', {
+      model: args.model,
+      predictionsCount: Array.isArray(json.predictions) ? json.predictions.length : 0,
+    })
+    throw new Error('No image data returned by Imagen for this prompt.')
   }
 
   return { model: args.model, images }
@@ -147,21 +253,27 @@ app.post('/api/generate-image', async (req, res) => {
   if (!prompt) return res.status(400).json({ error: 'Missing prompt' })
 
   const model = (body.model ?? DEFAULT_MODEL).toString().trim()
+  const aspect = body.aspect
+  const n = body.n
 
   try {
-    const out = await enqueue(() =>
-      geminiGenerateImage({
-        prompt,
-        model,
-        seed: body.seed,
-        aspect: body.aspect,
-        n: body.n,
-      })
-    )
+    const out = await enqueue(() => {
+      if (isImagenModel(model)) {
+        return imagenPredict({ prompt, model, aspect, n })
+      }
+      return geminiGenerateImage({ prompt, model, seed: body.seed, aspect, n })
+    })
 
     return res.json(out)
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Unknown error'
+    console.error('[nano-banana] /api/generate-image failed', {
+      model,
+      aspect,
+      n,
+      promptLen: prompt.length,
+      error: message,
+    })
     return res.status(500).json({ error: message })
   }
 })
