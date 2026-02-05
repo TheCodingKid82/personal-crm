@@ -53,5 +53,18 @@ pnpm dev
 - Variant matrix (concepts × weights × styles × colorways): `src/branding/variants.ts`
 - Color palettes: `src/branding/colorways.ts`
 
+## Generated PNGs (saved)
+If you drop externally-generated PNG comps into:
+
+`public/generated/<concept>/*.png`
+
+…run:
+
+```bash
+pnpm gen:manifest
+```
+
+The app will show them under **Generated (Saved PNGs)**.
+
 ## Notes
 These SVGs are designed on a 24×24 viewBox with consistent caps/joins for legibility.

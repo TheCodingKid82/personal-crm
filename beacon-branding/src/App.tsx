@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import './App.css'
 import type { BgMode, ColorwayId, ConceptId, StrokeStyleId, StrokeWeightId } from './branding/types'
 import { getColorway } from './branding/colorways'
@@ -14,6 +14,14 @@ type GeneratedComp = {
   model: string
   createdAt: number
   images: Array<{ mimeType: string; base64: string }>
+}
+
+type GeneratedManifest = {
+  generatedAt: string
+  concepts: Array<{
+    id: string
+    items: Array<{ src: string; filename: string }>
+  }>
 }
 
 type FilterAll<T extends string> = T | 'all'
@@ -33,6 +41,37 @@ function App() {
   const [genBusy, setGenBusy] = useState<ConceptId | null>(null)
   const [genError, setGenError] = useState<string | null>(null)
   const [generated, setGenerated] = useState<GeneratedComp[]>([])
+
+  const [savedManifest, setSavedManifest] = useState<GeneratedManifest | null>(null)
+  const [savedError, setSavedError] = useState<string | null>(null)
+
+  const conceptNameById = useMemo(() => {
+    const map = new Map<string, string>()
+    for (const c of CONCEPTS) map.set(c.id, c.name)
+    return map
+  }, [])
+
+  useEffect(() => {
+    let cancelled = false
+
+    async function loadManifest() {
+      try {
+        setSavedError(null)
+        const res = await fetch(`/generated/manifest.json?ts=${Date.now()}`)
+        if (!res.ok) throw new Error(`Failed to load generated manifest (${res.status})`)
+        const json = (await res.json()) as GeneratedManifest
+        if (!cancelled) setSavedManifest(json)
+      } catch (e: unknown) {
+        const msg = e instanceof Error ? e.message : 'Failed to load generated manifest'
+        if (!cancelled) setSavedError(msg)
+      }
+    }
+
+    loadManifest()
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
@@ -293,6 +332,56 @@ function App() {
           )}
         </section>
       ) : null}
+
+      <section className="filters">
+        <div style={{ display: 'flex', gap: 10, alignItems: 'flex-end', justifyContent: 'space-between' }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontWeight: 700, marginBottom: 6 }}>Generated (Saved PNGs)</div>
+            <div style={{ opacity: 0.8, fontSize: 13 }}>
+              Loads from <code>/public/generated</code> via <code>/generated/manifest.json</code>.
+            </div>
+          </div>
+
+          {savedError ? <div style={{ color: '#ff8a8a', fontSize: 13 }}>{savedError}</div> : null}
+          {savedManifest ? (
+            <div style={{ opacity: 0.7, fontSize: 12 }}>Last updated: {new Date(savedManifest.generatedAt).toLocaleString()}</div>
+          ) : null}
+        </div>
+
+        {savedManifest ? (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 12, marginTop: 12 }}>
+            {savedManifest.concepts.flatMap((c) =>
+              c.items.map((it) => {
+                const conceptLabel = conceptNameById.get(c.id) ?? c.id
+                return (
+                  <div key={`${c.id}__${it.filename}`} className="card" style={{ background: '#111827' }}>
+                    <img
+                      src={it.src}
+                      alt={`${conceptLabel} ${it.filename}`}
+                      style={{ width: '100%', height: 220, objectFit: 'contain', padding: 14, background: '#ffffff' }}
+                    />
+
+                    <div className="label">
+                      <div className="labelTop">{conceptLabel}</div>
+                      <div className="labelBottom">{it.filename}</div>
+                    </div>
+
+                    <div className="actions">
+                      <a href={it.src} download={it.filename}>
+                        <button>Download PNG</button>
+                      </a>
+                    </div>
+                  </div>
+                )
+              })
+            )}
+          </div>
+        ) : (
+          <div style={{ marginTop: 12, opacity: 0.8, fontSize: 13 }}>
+            No manifest found yet. Run <code>pnpm gen:manifest</code> after adding PNGs to <code>public/generated</code>.
+          </div>
+        )}
+      </section>
 
       <main className="grid">
         {filtered.map((v) => {
