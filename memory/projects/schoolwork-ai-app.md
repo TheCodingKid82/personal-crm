@@ -57,8 +57,56 @@
 Source: Claude (Opus 4.5) generated 100 names across 10 patterns + curated a Top 20. Notes below are *probabilistic* collision/SEO risks (not a trademark/domain check).
 
 ## Decision (2026-02-05)
-- Working name selected: **Beacon**
-- Next: create logo directions + initial icon set (app icon + wordmark + monochrome mark)
+- Working name selected: **Clutch** (formerly Beacon)
+- Platform decision: **Mobile-first PWA** (web app added to home screen; not native App Store)
+- MVP wedge decision (Henry): **Study Pack first** (parent/teacher-safe + highly shareable)
+- Share unit naming (Henry): **Review Pack** (sounds normal in school group chats)
+
+## Product concept (live notes)
+### Packs (shareable unit)
+- A **Pack** is the unit of value + virality: one topic turned into a study layer + sharing layer.
+- V1 focus: **Review Packs** (aka Study Packs): flashcards, practice quiz, 1-page review sheet.
+- V2: **Assignment Packs** (Doc → turn-in ready) once trust + safety is established.
+- **Class Pack unlock**: each Pack has a solo version immediately + an upgraded version unlocked once ~5 classmates join (teacher-style questions, hard-mode quiz, most-missed Qs, etc.).
+- Safety constraint: no anonymous free text / no public comments / no rating classmates; sharing is utility-first only.
+
+---
+
+## Execution plan (mobile-first PWA)
+### Phase 1 — Foundation (2–4 days)
+- Next.js app (mobile-first)
+- PWA install (manifest + service worker) + “Add to Home Screen” onboarding
+- Auth (phone/email) + minimal profile: school, grade
+
+### Implementation notes (current MVP scaffold)
+- **Repo path:** `C:\Users\theul\clawd\clutch` (Next.js App Router + Tailwind)
+- **PWA:** `next-pwa` + `public/manifest.webmanifest` + placeholder icons in `public/icons/`
+  - Service worker generation configured in `clutch/next.config.ts` (disabled in dev)
+  - Install banner component: `clutch/src/components/install-banner.tsx`
+- **Core flows shipped:**
+  - `/` home paste → generate: `clutch/src/app/page.tsx`
+  - Generate endpoint (mock heuristic): `clutch/src/app/api/generate/route.ts`
+  - Pack page: `clutch/src/app/pack/[id]/page.tsx`
+  - Public preview + join to unlock: `clutch/src/app/p/[id]/page.tsx`
+- **Unlock mechanic (threshold=5):** SQLite via `better-sqlite3`
+  - DB logic: `clutch/src/lib/db.ts` (db file: `clutch/data/clutch.db`)
+  - Join APIs: `clutch/src/app/api/packs/[id]/join/route.ts` + `status/route.ts`
+- **Pack structure:** `clutch/src/lib/pack.ts` (flashcards, quiz, one-pager derived from text)
+
+
+### Phase 2 — Review Pack generator (4–7 days)
+- Input: paste text + upload doc (Google Doc link later if permissions are annoying)
+- Output: flashcards + quiz + 1-page review sheet
+- Pack pages: preview (no login) + full (login)
+
+### Phase 3 — Virality (3–5 days)
+- Share link + “Join this Review Pack” flow
+- Unlock mechanic: 5 joins → upgrade pack + push notifications
+- Notification timing presets: ~4pm + Sunday night
+
+### Phase 4 — Instrumentation + rollout (ongoing)
+- Metrics: shares/user, join conversion, pack completion, D1/D7
+- School-by-school rollout flags (atomic networks)
 
 ## Local branding tool (logo/icon explorer)
 - Folder: `C:\\Users\\theul\\clawd\\beacon-branding`
@@ -207,3 +255,98 @@ Source: Claude (Opus 4.5) generated 100 names across 10 patterns + curated a Top
 - **Very high collision:** Copilot (Microsoft), Grok (xAI), Codex (OpenAI), Vertex (Google Vertex AI)
 - **Likely crowded/generic SEO:** Spark, Beacon, Clarity, Insight, Planner, Session, Boost, Prism, Beam
 - **Possible category confusion:** Margin (finance/crypto), Sage (accounting), Slate (magazine), Drift (sleep), Sprint (telecom)
+
+---
+
+## Viral strategy research (Nikita Bier)
+*Source: Claude Deep Research mode UI (side panel). Note: the research run was still “gathering sources” when captured; treat numeric claims as **to-be-verified**. The patterns are what matter.*
+
+### Executive summary (what made tbh/Gas spread in schools)
+- **Schools are dense graphs**: you can reach “network effects” with a small number of installs because students share many overlapping connections (classes/teams). Once a threshold is crossed, adoption can jump extremely fast.
+- **Notification-first virality**: the product creates *reasons to ping non-users* (“someone mentioned you”, “you were voted…”, “unlock your result”) which prompts immediate installs.
+- **Constrained anonymity** (positive-only) reduces the downside of anonymous social while keeping the “mystery + status” upside.
+- **Geo/school scarcity**: launch *one school/region at a time* to create FOMO and the feeling that “everyone at my school is on this.”
+
+### Key takeaways (high-signal claims surfaced in the research panel)
+- Schools can hit extremely high penetration quickly once a tipping point is reached (panel claim: **~40% download in 24 hours** in some cases).
+- “Exclusivity + timing” tactics: create coordinated moments (panel claim: notifications synchronized around **~4pm dismissal**) to amplify in-person chatter.
+- “Teen invites are uniquely high”: panel claim that **invitation rate drops ~20% per year of age from 13→18**, so younger teens are the most viral cohort.
+- Retention risk: panel claim that some of these apps peaked fast, then struggled with longer-term retention (tbh/Gas narrative: fast virality ≠ durable daily utility).
+
+### Growth loops to copy (adapted for Beacon)
+**Loop A — “You were mentioned” → install**
+1) User completes an action that references peers (vote/endorse/shoutout/study win).
+2) Referenced peer gets a notification/SMS/push: “Someone in *[School]* gave you a Beacon.”
+3) On open/install, the peer must join their school cohort (lightweight verification) to reveal it.
+4) Reveal screen nudges them to give 3–5 Beacons to others.
+
+**Loop B — Cohort unlock / school leaderboard**
+1) School feed is partially locked until **X classmates** join (or X people in your grade/class).
+2) Each new join increases visible “school energy” meter.
+3) Users share invites to unlock their cohort feed (teams/clubs/class periods become sub-cohorts).
+
+**Loop C — Daily prompts → outbound invites**
+1) Daily prompt that is *positive + identity/status* (e.g., “Most clutch explainer”, “Saved the group project”).
+2) Prompt requires selecting from contacts/school roster.
+3) Each vote triggers notifications, pulling in non-users.
+
+### Distribution channels & launch tactics (school-by-school)
+- **Seed by clusters**: teams, clubs, friend groups (sports + activities) are ideal “mini-graphs.”
+- **Off-platform sharing**: iMessage/Snap/IG stories as the main distribution rails.
+- **Time releases**: launch moments that align with when students are together (lunch, dismissal, evening scrolling).
+- **Local exclusivity**: start with one metro area; create “your school is live” moments.
+
+### Referral / invite system mechanics (practical)
+- “Give 5, get 1” style: you must send Beacons to reveal yours, or to unlock your “week recap.”
+- “Skip the wait” / fast track for inviting 3 friends.
+- “School roster” onboarding: users pick school → verify via email domain / code / invite-only roster.
+- Rate limits to prevent spam; strong anti-abuse throttles by device + IP.
+
+### Safety / parent / school constraints (and mitigations)
+- **Avoid freeform anonymous messaging.** Only allow *positive-only* preset prompts + structured endorsements.
+- **Hard moderation primitives**: report, block, “remove me from this,” hide identity where appropriate; audit logs.
+- **Under-13 / COPPA**: default to 13+; if supporting 7–8th graders, implement age-gating + parental consent path (or restrict features).
+- **School admin concerns**: publish a clear safety policy + how anonymity works; make it easy to contact support.
+- **Bullying risk**: do not allow negative rankings; no “least ___” prompts; no public tallies that can ostracize.
+
+### 30-day launch plan (for Beacon)
+**North-star objective:** win *school-by-school adoption* while staying safe.
+
+**KPIs to instrument day 0**
+- Activation: % who verify school + complete first “Beacon” (endorsement) within 10 min
+- Viral: invites sent/user, invite accept rate, K-factor (invites→activated)
+- Retention: D1/D7 (overall + by school penetration bucket)
+- School penetration: % of target school active in last 7 days
+- Content: endorsements/day, study wins/day, group sessions created
+- Safety: reports/1k actions, block rate, “remove me” rate, moderation SLA
+
+**Week 1 (Days 1–7): Build the loop + seed one school**
+- Pick 1–2 target schools (same metro). Recruit 20–50 students via clubs/teams.
+- Ship: school verification, endorsement prompts, “you were mentioned” notifications.
+- Goal: ≥25% of seed cohort sends ≥5 invites.
+
+**Week 2 (Days 8–14): Drive school threshold**
+- Add cohort unlock meter + “grade/class circles.”
+- Add “daily prompt” cadence + recap.
+- Goal: 10–15% of the school installed OR a visible “everyone is on it” hallway effect.
+
+**Week 3 (Days 15–21): Replicate to 3–5 schools**
+- Repeat playbook; optimize activation funnel and invite conversion.
+- Add anti-spam throttles and safety tooling based on real reports.
+- Goal: K-factor > 1.0 inside seeded schools (even if global K < 1).
+
+**Week 4 (Days 22–30): Scale within metro + harden safety**
+- Launch “school live” moments + timed notifications.
+- Publish safety transparency page; refine prompt library.
+- Goal: 5–10 schools with ≥5% weekly active penetration; D7 retention improving week-over-week.
+
+### What to copy vs. what to avoid
+**Copy**
+- School-based exclusivity + dense-graph seeding
+- Notification loops that reference *you* (identity/status)
+- Constrained positive-only anonymity
+
+**Avoid**
+- Freeform anonymous posting
+- Negative ranking mechanics
+- Over-optimizing for initial spike without a durable daily use case (study utility must stay core)
